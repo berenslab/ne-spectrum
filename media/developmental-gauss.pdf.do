@@ -63,7 +63,7 @@ def panel_datapaths(
 
 
 if __name__ == "__main__":
-    dsrc = Path("../../data/gauss_devel")
+    dsrc = Path("../data/gauss_devel")
     init_name = "random"
 
     datafiles, titles = panel_datapaths(  # jnb_msc.plot.SixPanelPlot.

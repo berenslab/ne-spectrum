@@ -13,7 +13,7 @@ from pathlib import Path
 
 
 if __name__ == "__main__":
-    dsrc = Path("../data/treutlein")
+    dsrc = Path("../../data/treutlein")
 
     datafiles, titles = jnb_msc.plot.SixPanelPlot.panel_datapaths(dsrc, hi_exag=30)
 

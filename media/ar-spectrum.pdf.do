@@ -29,7 +29,7 @@ def draw_arrow(
     xyA=(0.5, 1),
     xyB=(0.5, 0.5),
     shrinkA=15,
-    shrinkB=30,
+    shrinkB=33,
     head_width=0.15,
     head_length=0.15,
 ):
@@ -58,23 +58,28 @@ def plot_spectrum(
     cols = 6
     box_inch = width_inch / cols
     fig, axs = plt.subplots(
-        rows, cols, figsize=(width_inch, rows * box_inch), constrained_layout=False,
+        rows,
+        cols,
+        # ugly hack to have the figure have as many pixels as the
+        # other ones (3,300)
+        figsize=(width_inch, rows * box_inch),
+        constrained_layout=False,
     )
     fig.subplots_adjust(0, 0, 1, 1)
     gs = axs[0, 0].get_gridspec()
 
     axs[0, 0].set_title("Laplacian Eigenmaps")
-    axs[0, 0].scatter(
-        spectral[:, 0], spectral[:, 1], c=labels, alpha=alpha, rasterized=True
-    )
+    axs[0, 0].scatter(spectral[:, 0], spectral[:, 1], c=labels, alpha=alpha)
+    axs[0, 0].set_xlabel("Eig 1", labelpad=2)
+    sp_ylbl = axs[0, 0].set_ylabel("Eig 2", labelpad=2, va="baseline")
     axs[0, 0].set_zorder(2)
     axs[0, 3].set_title("t-SNE ($\\rho = {}$1)")
-    axs[0, 3].scatter(tsne[:, 0], tsne[:, 1], c=labels, alpha=alpha, rasterized=True)
+    axs[0, 3].scatter(tsne[:, 0], tsne[:, 1], c=labels, alpha=alpha)
     axs[0, 3].set_zorder(3)
     axs[1, 1].set_title("ForceAtlas2")
-    axs[1, 1].scatter(fa2[:, 0], fa2[:, 1], c=labels, alpha=alpha, rasterized=True)
+    axs[1, 1].scatter(fa2[:, 0], fa2[:, 1], c=labels, alpha=alpha)
     axs[1, 2].set_title("UMAP")
-    axs[1, 2].scatter(umap[:, 0], umap[:, 1], c=labels, alpha=alpha, rasterized=True)
+    axs[1, 2].scatter(umap[:, 0], umap[:, 1], c=labels, alpha=alpha)
 
     # remove unused axes
     axs[1, 0].remove()
@@ -86,6 +91,7 @@ def plot_spectrum(
     axs[0, 2].remove()
     axs[0, 4].remove()
     axs[0, 5].remove()
+    # fig.set_size_inches(width_inch, rows * box_inch)
 
     # add t-sne with exaggeration
     gs_exag = gridspec.GridSpecFromSubplotSpec(1, 3, subplot_spec=gs[0, 1:3])
@@ -98,14 +104,14 @@ def plot_spectrum(
         ax = fig.add_subplot(g, zorder=5)
         exag_axs.append(ax)
         ax.set_title(title)
-        ax.scatter(data[:, 0], data[:, 1], c=labels, alpha=alpha, rasterized=True)
+        ax.scatter(data[:, 0], data[:, 1], c=labels, alpha=alpha)
 
     # create this gridspec for three plots to enfore the same size of
     # the previous plots
     gs_half = gridspec.GridSpecFromSubplotSpec(1, 3, subplot_spec=gs[0, 4:])
     ax = fig.add_subplot(gs_half[0], zorder=5)
     ax.set_title(r"$\rho = \mathdefault{\frac{1}{2}}$")
-    ax.scatter(tsnehalf[:, 0], tsnehalf[:, 1], c=labels, alpha=alpha, rasterized=True)
+    ax.scatter(tsnehalf[:, 0], tsnehalf[:, 1], c=labels, alpha=alpha)
 
     arrstyle = mpl.patches.ArrowStyle("<->", head_length=0.4, head_width=0.4)
     _, tops, lefts, rights = gs_exag.get_grid_positions(fig)
@@ -142,6 +148,7 @@ def plot_spectrum(
     gs_spectral = gs[:, 0].subgridspec(4, 2)
     cmap = plt.get_cmap("tab20", lut=np.unique(labels).shape[0])
     title_fmt = "Eigs {}/{}"
+    label_fmt = "Eig {}"
 
     # only show those three digits
     mask = np.isin(labels, [4, 7, 9])
@@ -150,35 +157,46 @@ def plot_spectrum(
     clrs = cmap(labels)[mask]
     ax = fig.add_subplot(gs_spectral[2, 0], zorder=5, label="spectral_sub")
     i, j = 7, 9
-    ax.set_xlabel(
-        title_fmt.format(i, j),
-        fontsize=plt.rcParams["axes.titlesize"],
-        labelpad=plt.rcParams["axes.titlepad"],
-    )
-    ax.scatter(
-        spectral[mask, i - 1],
-        spectral[mask, j - 1],
-        c=clrs,
-        alpha=alpha,
-        rasterized=True,
-    )
+    # ax.set_xlabel(
+    #     title_fmt.format(i, j),
+    #     fontsize=plt.rcParams["axes.titlesize"],
+    #     labelpad=plt.rcParams["axes.titlepad"],
+    # )
+    ax.set_xlabel(label_fmt.format(i), labelpad=2)
+    ax.set_ylabel(label_fmt.format(j), labelpad=2, va="baseline")
+    ax.scatter(spectral[mask, i - 1], spectral[mask, j - 1], c=clrs, alpha=alpha)
 
     mask = np.isin(labels, [3, 5, 8])
     clrs = cmap(labels)[mask]
     ax = fig.add_subplot(gs_spectral[2, 1], zorder=5, label="spectral_sub")
-    i, j = 9, 12
-    ax.set_xlabel(
-        title_fmt.format(i, j),
-        fontsize=plt.rcParams["axes.titlesize"],
-        labelpad=plt.rcParams["axes.titlepad"],
-    )
-    ax.scatter(
-        spectral[mask, i - 1],
-        -spectral[mask, j - 1],
-        c=clrs,
-        alpha=alpha,
-        rasterized=True,
-    )
+    i, j = 12, 9
+    ax.set_xlabel(label_fmt.format(i), labelpad=2)
+    # ax.set_ylabel(label_fmt.format(j))
+    # ax.set_xlabel(
+    #     title_fmt.format(i, j),
+    #     fontsize=plt.rcParams["axes.titlesize"],
+    #     labelpad=plt.rcParams["axes.titlepad"],
+    # )
+    ax.scatter(spectral[mask, i - 1], -spectral[mask, j - 1], c=clrs, alpha=alpha)
+
+    for ax in fig.get_axes():
+        ax.set_xticks([])
+        ax.set_yticks([])
+        if ax.get_label() != "arrow_bg":
+            jnb_msc.plot.set_aspect_center(ax)
+        if ax.get_label() == "spectral_sub":
+            pos = ax.get_position()
+            y_len = pos.y1 - pos.y0
+            # hacky way to determine the whitespace in-between the
+            # spectral subvectors
+            hspace = y_len * gs_spectral.get_subplot_params().wspace
+            # place the axis below the full spectral embedding
+            pos.y1 = sp_ylbl.get_position()[1]
+            pos.y0 = pos.y1 - y_len
+            ax.set_position(pos)
+
+    draw_arrow(fig, axesA=axs[1, 1], axesB=exag_axs[1])
+    draw_arrow(fig, axesA=axs[1, 2], axesB=exag_axs[2], shrinkA=12, shrinkB=25)
 
     # add the arrow that indicates the repulsion spectrum
     pos = axs[0, 0].get_position()
@@ -200,25 +218,6 @@ def plot_spectrum(
         head_width=0.2,
         head_length=0.2,
     )
-
-    for ax in fig.get_axes():
-        ax.set_xticks([])
-        ax.set_yticks([])
-        if ax.get_label() != "arrow_bg":
-            jnb_msc.plot.set_aspect_center(ax)
-        if ax.get_label() == "spectral_sub":
-            pos = ax.get_position()
-            y_len = pos.y1 - pos.y0
-            # hacky way to determine the whitespace in-between the
-            # spectral subvectors
-            hspace = y_len * gs_spectral.get_subplot_params().wspace
-            # place the axis below the full spectral embedding
-            pos.y1 = axs[0, 0].get_position().y0 - hspace
-            pos.y0 = pos.y1 - y_len
-            ax.set_position(pos)
-
-    draw_arrow(fig, axesA=axs[1, 1], axesB=exag_axs[1])
-    draw_arrow(fig, axesA=axs[1, 2], axesB=exag_axs[2], shrinkA=12, shrinkB=23)
 
     ## obviously this is super specific to the plot at hand
     for i in range(10):
@@ -267,7 +266,7 @@ if __name__ == "__main__":
     # (on MNIST)
     data[0] *= -1
 
-    with plt.rc_context({"font.size": 4, "axes.titlesize": "large"}, fname=rcfile):
+    with plt.rc_context({"font.size": 4.25, "axes.titlesize": "larger"}, fname=rcfile):
         fig, *_ = plot_spectrum(*data, labels=labels)
     fig.savefig(sys.argv[3], format="pdf", bbox_inches="tight")
     # link to the result

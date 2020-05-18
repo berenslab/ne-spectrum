@@ -1,0 +1,44 @@
+#### SCATTER PLOTS
+scatter.marker : .               ## The default marker type for scatter plots.
+scatter.edgecolors : None
+lines.markersize  : 1            ## markersize, in points
+                                 ## used by scatter plot s = l.ms**2
+lines.linewidth : .5
+image.cmap   : tab20             ## A colormap name, gray etc...
+
+
+## * FIGURE                                                                  *
+figure.figsize     : 5.5, 5      ## figure size in inches
+figure.dpi         : 600         ## figure dots per inch
+#figure.facecolor   : white     ## figure facecolor
+#figure.edgecolor   : white     ## figure edgecolor
+#figure.frameon     : True      ## enable figure frame
+
+font.size : 5
+font.family : Arial, Helvetica, sans-serif
+font.sans-serif : Arial, Helvetica, sans-serif
+font.serif : TeX Gyre Termes
+axes.titlesize : 6
+axes.titlepad : 3
+axes.linewidth : .3
+xtick.major.width: .3
+ytick.major.width: .3
+xtick.major.size: 2
+ytick.major.size: 2
+xtick.major.pad: 1.5
+ytick.major.pad: 1.5
+
+
+
+axes.unicode_minus : True
+text.usetex: False
+text.latex.unicode : True
+# text.latex.preamble : "\\usepackage{amsmath}"
+
+mathtext.it : sans:italic
+mathtext.rm : sans
+mathtext.sf : sans
+mathtext.bf  : sans:bold
+mathtext.cal : sans
+mathtext.default : regular
+# mathtext.fontset : custom

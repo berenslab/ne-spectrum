@@ -69,17 +69,19 @@ def plot_spectrum(
     gs = axs[0, 0].get_gridspec()
 
     axs[0, 0].set_title("Laplacian Eigenmaps")
-    axs[0, 0].scatter(spectral[:, 0], spectral[:, 1], c=labels, alpha=alpha)
+    axs[0, 0].scatter(
+        spectral[:, 0], spectral[:, 1], c=labels, alpha=alpha, rasterized=True
+    )
     axs[0, 0].set_xlabel("Eig 1", labelpad=2)
     sp_ylbl = axs[0, 0].set_ylabel("Eig 2", labelpad=2, va="baseline")
     axs[0, 0].set_zorder(2)
     axs[0, 3].set_title("t-SNE ($\\rho = {}$1)")
-    axs[0, 3].scatter(tsne[:, 0], tsne[:, 1], c=labels, alpha=alpha)
+    axs[0, 3].scatter(tsne[:, 0], tsne[:, 1], c=labels, alpha=alpha, rasterized=True)
     axs[0, 3].set_zorder(3)
     axs[1, 1].set_title("ForceAtlas2")
-    axs[1, 1].scatter(fa2[:, 0], fa2[:, 1], c=labels, alpha=alpha)
+    axs[1, 1].scatter(fa2[:, 0], fa2[:, 1], c=labels, alpha=alpha, rasterized=True)
     axs[1, 2].set_title("UMAP")
-    axs[1, 2].scatter(umap[:, 0], umap[:, 1], c=labels, alpha=alpha)
+    axs[1, 2].scatter(umap[:, 0], umap[:, 1], c=labels, alpha=alpha, rasterized=True)
 
     # remove unused axes
     axs[1, 0].remove()
@@ -104,14 +106,14 @@ def plot_spectrum(
         ax = fig.add_subplot(g, zorder=5)
         exag_axs.append(ax)
         ax.set_title(title)
-        ax.scatter(data[:, 0], data[:, 1], c=labels, alpha=alpha)
+        ax.scatter(data[:, 0], data[:, 1], c=labels, alpha=alpha, rasterized=True)
 
     # create this gridspec for three plots to enfore the same size of
     # the previous plots
     gs_half = gridspec.GridSpecFromSubplotSpec(1, 3, subplot_spec=gs[0, 4:])
     ax = fig.add_subplot(gs_half[0], zorder=5)
     ax.set_title(r"$\rho = \mathdefault{\frac{1}{2}}$")
-    ax.scatter(tsnehalf[:, 0], tsnehalf[:, 1], c=labels, alpha=alpha)
+    ax.scatter(tsnehalf[:, 0], tsnehalf[:, 1], c=labels, alpha=alpha, rasterized=True)
 
     arrstyle = mpl.patches.ArrowStyle("<->", head_length=0.4, head_width=0.4)
     _, tops, lefts, rights = gs_exag.get_grid_positions(fig)
@@ -164,7 +166,13 @@ def plot_spectrum(
     # )
     ax.set_xlabel(label_fmt.format(i), labelpad=2)
     ax.set_ylabel(label_fmt.format(j), labelpad=2, va="baseline")
-    ax.scatter(spectral[mask, i - 1], spectral[mask, j - 1], c=clrs, alpha=alpha)
+    ax.scatter(
+        spectral[mask, i - 1],
+        spectral[mask, j - 1],
+        c=clrs,
+        alpha=alpha,
+        rasterized=True,
+    )
 
     mask = np.isin(labels, [3, 5, 8])
     clrs = cmap(labels)[mask]
@@ -177,7 +185,13 @@ def plot_spectrum(
     #     fontsize=plt.rcParams["axes.titlesize"],
     #     labelpad=plt.rcParams["axes.titlepad"],
     # )
-    ax.scatter(spectral[mask, i - 1], -spectral[mask, j - 1], c=clrs, alpha=alpha)
+    ax.scatter(
+        spectral[mask, i - 1],
+        -spectral[mask, j - 1],
+        c=clrs,
+        alpha=alpha,
+        rasterized=True,
+    )
 
     for ax in fig.get_axes():
         ax.set_xticks([])

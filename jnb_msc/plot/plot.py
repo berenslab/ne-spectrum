@@ -380,7 +380,9 @@ class PlotRow(ScatterMultiple):
             for ax, d, title, letter in zip(
                 axs, self.data, titles, string.ascii_lowercase
             ):
-                ax.scatter(d[:, 0], d[:, 1], c=self.labels, alpha=self.alpha)
+                ax.scatter(
+                    d[:, 0], d[:, 1], c=self.labels, alpha=self.alpha, rasterized=True
+                )
                 ax.set_title(title)
                 set_aspect_center(ax)
                 self.add_lettering(ax, letter, fontdict=letter_dict, loc="left")

@@ -33,7 +33,7 @@ if __name__ == "__main__":
     # be saved in the data dir.
     relname = sys.argv[2]
     plotter = jnb_msc.plot.PlotRow(
-        datafiles, plotname=relname, titles=titles, format="png", scalebars=0.2
+        datafiles, plotname=relname, titles=titles, format="pdf", scalebars=0.2
     )
     filedeps = set(
         [

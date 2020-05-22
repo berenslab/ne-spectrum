@@ -55,7 +55,7 @@ if __name__ == "__main__":
     # be saved in the data dir.
     relname = sys.argv[2]
     plotter = jnb_msc.plot.ScatterMultiple(
-        dpaths, plotname=relname, titles=titles, format="png", scalebars=0.25
+        dpaths, plotname=relname, titles=titles, format="pdf", scalebars=0.25
     )
     filedeps = set(
         [

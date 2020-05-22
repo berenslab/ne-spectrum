@@ -74,7 +74,7 @@ if __name__ == "__main__":
     # be saved in the data dir.
     relname = sys.argv[2]
     plotter = jnb_msc.plot.SixPanelPlot(
-        datafiles, plotname=relname, titles=titles, format="png", alpha=0.5
+        datafiles, plotname=relname, titles=titles, format="pdf", alpha=0.5
     )
     filedeps = set(
         [

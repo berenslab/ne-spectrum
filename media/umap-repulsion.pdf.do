@@ -37,7 +37,7 @@ if __name__ == "__main__":
         datafiles,
         plotname=relname,
         titles=titles,
-        format="png",
+        format="pdf",
         scalebars=0.3,
         alpha=1,
     )

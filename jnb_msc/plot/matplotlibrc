@@ -21,8 +21,10 @@ font.serif : TeX Gyre Termes
 axes.titlesize : 6
 axes.titlepad : 3
 axes.linewidth : .3
-xtick.major.width: .3
-ytick.major.width: .3
+xtick.major.width: .4
+ytick.major.width: .4
+xtick.minor.width: .3
+ytick.minor.width: .3
 xtick.major.size: 2
 ytick.major.size: 2
 xtick.major.pad: 1.5

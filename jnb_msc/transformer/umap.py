@@ -104,6 +104,7 @@ def optimize_layout_euclidean(
     parallel=False,
     verbose=False,
     saver=None,
+    save_freq=25,
 ):
     """This is a slightly edited copy from umap.layouts, amended for
     the use case here.  Look at the documentation in the respective
@@ -150,7 +151,7 @@ def optimize_layout_euclidean(
 
         alpha = initial_alpha * (1.0 - (float(n) / float(n_epochs)))
 
-        if callable(saver):
+        if callable(saver) and n % save_freq == 0:
             saver(n, np.nan, head_embedding)
 
         if verbose and n % int(n_epochs / 10) == 0:
@@ -177,6 +178,7 @@ class UMAP(SimStage):
         gamma=1,
         eps=0.001,
         parallel=False,
+        save_freq=25,
     ):
         super().__init__(
             path,
@@ -196,6 +198,7 @@ class UMAP(SimStage):
         self.parallel = parallel
         self.gamma = gamma
         self.eps = eps
+        self.save_freq = save_freq
 
     def get_datadeps(self):
         return [
@@ -246,6 +249,7 @@ class UMAP(SimStage):
             parallel=self.parallel,
             verbose=False,
             saver=saver,
+            save_freq=self.save_freq,
         )
         return self.data_
 

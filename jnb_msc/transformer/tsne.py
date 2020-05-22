@@ -33,7 +33,7 @@ class TSNEStage(SimStage):
         exaggeration=1,
         momentum=0.5,
         n_jobs=-1,
-        save_iter_freq=1,
+        save_iter_freq=25,
     ):
         super().__init__(
             path,
@@ -98,7 +98,7 @@ class TSNE(SimStage):
         early_momentum=0.5,
         late_momentum=0.8,
         n_jobs=-1,
-        save_iter_freq=1,
+        save_iter_freq=25,
     ):
         self.early = TSNEStage(
             path,

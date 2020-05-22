@@ -18,10 +18,6 @@ from matplotlib.offsetbox import TextArea, DrawingArea, OffsetImage, AnnotationB
 from pathlib import Path
 
 
-def rep_atr_arrows():
-    pass
-
-
 def draw_arrow(
     fig,
     axesA,

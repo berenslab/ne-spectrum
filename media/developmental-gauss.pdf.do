@@ -30,7 +30,7 @@ def panel_datapaths(
     fa2 = dsrc / ann_prefix / init / "stdscale;f:10" / "fa2"
     umap = dsrc / umap_prefix / init / "maxscale;f:10" / "umap"
 
-    tsne_prefix = "stdscale;f:1e-4/affinity"
+    tsne_prefix = "affinity"
     if perplexity is not None:
         tsne_prefix += f";perplexity:{perplexity}"
     elif k is not None:

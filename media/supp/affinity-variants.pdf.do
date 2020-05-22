@@ -14,7 +14,7 @@ from pathlib import Path
 
 if __name__ == "__main__":
     dsrc = Path("../../data/mnist/pca")
-    knn_prefix = "knn_aff"
+    knn_prefix = "ann/spnorm"
 
     tsne_default = dsrc / "affinity/stdscale;f:1e-4/tsne"
     tsne_knn = dsrc / knn_prefix / "stdscale;f:1e-4/tsne"

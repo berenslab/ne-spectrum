@@ -22,14 +22,14 @@ if __name__ == "__main__":
     umap_titles = []
     for nu in nus:
         umap_runs.append(umap_init / f"umap;n_iter:{n_epochs};nu:{nu}")
-        umap_titles.append(f"UMAP, $\\nu={{}}${nu}\n")
+        umap_titles.append(f"UMAP, $\\nu={{}}${nu}")
 
     tsne_runs = [
         dsrc / "affinity/stdscale;f:1e-4/tsne",
         dsrc / "affinity/stdscale;f:1e-4/tsne;late_exaggeration:2",
     ]
 
-    titles = ["Exag. t-SNE,\n$\\rho=$2"] + umap_titles + ["t-SNE\n"]
+    titles = ["t-SNE, $\\rho=$2"] + umap_titles + ["t-SNE"]
     datafiles = tsne_runs[1:] + umap_runs + tsne_runs[:1]
 
     relname = sys.argv[2]

@@ -15,7 +15,9 @@ from pathlib import Path
 if __name__ == "__main__":
     dsrc = Path("../../data/treutlein")
 
-    datafiles, titles = jnb_msc.plot.SixPanelPlot.panel_datapaths(dsrc, hi_exag=30)
+    datafiles, titles = jnb_msc.plot.SixPanelPlot.panel_datapaths(
+        dsrc, lo_exag=7, hi_exag=40
+    )
 
     # passing a relative plotname will ensure that the plot will also
     # be saved in the data dir.

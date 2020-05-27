@@ -30,7 +30,7 @@ if __name__ == "__main__":
 
     zs = np.array([computeZ(np.load(X)) for X in tsnes])
     n = np.load(dsrc / "data.npy").shape[0]
-    lognz = np.log(-zs)
-    df = pd.DataFrame({"rho": rhos, "Z/N": zs, "log(N/Z)": lognz})
+    # lognz = np.log(-zs)
+    df = pd.DataFrame({"rho": rhos, "Z/N": zs})
 
     df.to_csv(sys.argv[3])

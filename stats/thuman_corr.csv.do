@@ -12,6 +12,7 @@ if __name__ == "__main__":
     dsrc = Path("../data/treutlein_409b2")
     rng = np.random.RandomState(72070)
 
+    lib.redo.redo_ifchange([lib.__file__])
     rhos = lib.get_rhos()
 
     c_fa2, c_umap = lib.correlate_dataset(dsrc, rhos, random_state=rng)

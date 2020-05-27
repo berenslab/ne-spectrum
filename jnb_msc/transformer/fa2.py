@@ -13,7 +13,7 @@ class FA2(SimStage):
         initname="data.npy",
         n_components=2,
         random_state=None,
-        n_iter=500,
+        n_iter=750,
         repulsion=2,
         jitter_tol=1,
         theta=1.2,

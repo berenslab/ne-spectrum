@@ -170,7 +170,7 @@ class UMAP(SimStage):
         knn_dists_name="knn_dists.npy",
         n_components=2,
         random_state=None,
-        n_iter=500,
+        n_iter=750,
         learning_rate=1,
         a=1,
         b=1,

@@ -32,7 +32,9 @@ class Subsample(GenStage):
         self.description = inlist[2].read_text()
 
     def transform(self):
-        self.indices = self.random_state.choice(self.data.shape[0], size=self.n)
+        self.indices = self.random_state.choice(
+            self.data.shape[0], size=self.n, replace=False
+        )
         self.data_ = self.data[self.indices]
         self.labels_ = self.labels[self.indices]
         self.description_ = self.description + f"  Downsampled to {self.n} samples."

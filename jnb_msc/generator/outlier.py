@@ -4,8 +4,9 @@ from . import GenStage
 
 
 class LEThreshold(GenStage):
-    """This class computes an LE embedding of the riginal data and
+    """This class computes an LE embedding of the original data and
     removes everything that is outside of the threshold."""
+
     def __init__(
         self,
         path,
@@ -33,7 +34,9 @@ class LEThreshold(GenStage):
         self.description = inlist[2].read_text()
 
     def transform(self):
-        self.indices = self.random_state.choice(self.data.shape[0], size=self.n)
+        self.indices = self.random_state.choice(
+            self.data.shape[0], size=self.n, replace=False
+        )
         self.data_ = self.data[self.indices]
         self.labels_ = self.labels[self.indices]
         self.description_ = self.description + f"  Downsampled to {self.n} samples."

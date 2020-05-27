@@ -62,8 +62,8 @@ class MaxScale(AbstractScale):
 
     def transform(self):
         if not self.negative_range:
-            self.data -= self.data.min()
-        self.data_ = (self.data / np.abs(self.data).max()) * self.f
+            self.data -= self.data.min(axis=0)
+        self.data_ = (self.data / np.abs(self.data).max(axis=0)) * self.f
 
         return self.data_
 

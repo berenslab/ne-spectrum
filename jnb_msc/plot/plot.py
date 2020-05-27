@@ -86,8 +86,9 @@ class ScatterMultiple(ProjectBase):
                 **self.kwargs,
             )
 
+            ax_iter = iter(axs.flat)
             for ax, dat, title, letter in zip(
-                axs.flat, self.data, titles, string.ascii_lowercase
+                ax_iter, self.data, titles, string.ascii_lowercase
             ):
                 ax.scatter(
                     dat[:, 0],
@@ -111,10 +112,15 @@ class ScatterMultiple(ProjectBase):
                 if title != "":
                     ax.set_title(title)
 
+                set_aspect_center(ax)
                 if self.scalebars:
                     self.add_scalebar(ax, self.scalebars)
 
                 self.add_lettering(ax, letter)
+
+            # if any axes are left empty, remove them
+            for ax in ax_iter:
+                ax.remove()
 
         self.data_ = fig, axs
         self.fig = fig
@@ -575,3 +581,9 @@ def add_gauss_devel_legend(ax, labels, cmap="copper"):
     )
     legend.get_frame().set_linewidth(0.4)
     return legend
+
+
+def despine(ax):
+    """Remove the upper and right axes border."""
+    ax.spines["right"].set_visible(False)
+    ax.spines["top"].set_visible(False)

@@ -276,7 +276,7 @@ if __name__ == "__main__":
     # (on MNIST)
     data[0] *= -1
 
-    with plt.rc_context({"font.size": 4.25, "axes.titlesize": "larger"}, fname=rcfile):
+    with plt.rc_context({"font.size": 5.25}, fname=rcfile):
         fig, *_ = plot_spectrum(*data, labels=labels)
     fig.savefig(sys.argv[3], format="pdf", bbox_inches="tight")
     # link to the result

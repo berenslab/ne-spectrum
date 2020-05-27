@@ -26,6 +26,8 @@ class ScatterMultiple(ProjectBase):
         format="png",
         rc=None,
         scalebars=None,
+        figwidth=5.5,  # in inches
+        figheight=None,
         **kwargs,
     ):
         if isinstance(paths, (str, Path)):
@@ -46,7 +48,8 @@ class ScatterMultiple(ProjectBase):
         self.format = format
         self.scalebars = scalebars
         self.kwargs = kwargs
-        self.figwidth = 5.5  # in inches
+        self.figwidth = figwidth
+        self.figheight = figheight
 
         if rc is None:
             # find the project default file, located in the same dir
@@ -69,12 +72,15 @@ class ScatterMultiple(ProjectBase):
             titles = self.titles
 
         rows, cols = auto_layout(len(self.data))
-        blocksize = self.figwidth / cols
+        if self.figheight is None:
+            width = (self.figwidth / cols) * rows
+        else:
+            width = self.figheight
         with plt.rc_context(fname=self.rc):
             fig, axs = plt.subplots(
                 nrows=rows,
                 ncols=cols,
-                figsize=(blocksize * cols, blocksize * rows),
+                figsize=(self.figwidth, width),
                 squeeze=False,
                 constrained_layout=True,
                 **self.kwargs,
@@ -359,7 +365,7 @@ class PlotRow(ScatterMultiple):
     def transform(self):
         rows = 1
         cols = len(self.data)
-        blocksize = 5.5 / cols
+        height = (self.figwidth / cols) if self.figheight is None else self.figheight
 
         if self.titles is None:
             titles = titles_from_paths(self.paths)
@@ -368,10 +374,7 @@ class PlotRow(ScatterMultiple):
 
         with plt.rc_context(fname=self.rc):
             fig, axs = plt.subplots(
-                rows,
-                cols,
-                figsize=(blocksize * cols, blocksize * rows),
-                constrained_layout=True,
+                rows, cols, figsize=(self.figwidth, height), constrained_layout=True,
             )
             letter_dict = {
                 "fontsize": "x-large",

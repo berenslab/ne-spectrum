@@ -33,18 +33,18 @@ if __name__ == "__main__":
     dpaths = [
         tsne_default,
         tsne_knn,
-        fa2,
         fa2_degrep,
+        fa2,
         umap_default,
         umap,
         umap_knn,
         umap_knn_eps,
     ]
     titles = [
-        "Default t-SNE",
-        "t-SNE, kNN affin. ($k={}$15)",
-        "FA2, Fixed repulsion",
-        "FA2, Repulsion by degree",
+        "Default t-SNE\n",
+        "t-SNE,\nkNN affin. ($k={}$15)",
+        "FA2,\nRepulsion by degree",
+        "FA2,\nFixed repulsion",
         "Default UMAP\n",
         "UMAP, $\mathit{a}=b=\mathdefault{1}$\n",
         "UMAP,\n$a=b=\mathdefault{1}$, kNN affin.",
@@ -55,7 +55,12 @@ if __name__ == "__main__":
     # be saved in the data dir.
     relname = sys.argv[2]
     plotter = jnb_msc.plot.ScatterMultiple(
-        dpaths, plotname=relname, titles=titles, format="pdf", scalebars=0.25
+        dpaths,
+        plotname=relname,
+        titles=titles,
+        format="pdf",
+        scalebars=0.25,
+        figheight=3,
     )
     filedeps = set(
         [

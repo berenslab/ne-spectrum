@@ -2,7 +2,7 @@ This repository holds the code for NeurIPS submission done during my
 master's thesis.
 
 
-* Structure
+* Structure/Installation
 The code all lives in =jnb_msc= and can be installed via
 
 #+begin_src sh
@@ -12,6 +12,18 @@ pip install -e .
 #+end_src
 
 There is also a =requirements.txt= file to install the dependencies.
+
+* Running the code
+To create a figure, you can simply [[*What are all those .do files?][redo]] one of the files in =media/=.
+For example, after installing redo, you can write
+=redo -j6 media/ar-spectrum.pdf=.  This will make sure that the data
+is present and up-to-date and generate the figure.  The instructions
+are written in the file =media/ar-spectrum.pdf.do=.  This calls out to
+redo again ([[file:media/ar-spectrum.pdf.do::redo.redo_ifchange(datafiles + \[plotter.labelname, plotter.rc\])][l. 268, in =media/ar-spectrum.pdf.do=]]), which will recurse
+until all dependencies have been satisfied and afterwards create the
+figure.  The file itself is written in pyhton, although the do file
+itself is language agnostic and can be set by the shebang (=#!=) in
+the first line of the file.
 
 * Code structure
 

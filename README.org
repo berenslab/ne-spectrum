@@ -1,0 +1,81 @@
+This repository holds the code for NeurIPS submission done during my
+master's thesis.
+
+
+* Structure
+The code all lives in =jnb_msc= and can be installed via
+
+#+begin_src sh
+git clone https://github.com/berenslab/ne-spectrum
+cd ne-spectrum
+pip install -e .
+#+end_src
+
+There is also a =requirements.txt= file to install the dependencies.
+
+* Code structure
+
+The classes in the project are all derived from a single base class.
+It forsees that every subclass implements four methods:
+1. =get_datadeps()=
+2. =load()=
+3. =transform()=
+4. =save()=
+
+The first function allows to query the object what files it needs,
+this is used by [[*What are all those .do files?][redo]] in order to track the dependencies properly.  The
+other remaining functions should be more or less self explanatory.  It
+is of course also possible to use the algorithms manually.  For that
+the =.data= field needs to be populated with suitable data and
+possibly the field =.init=, depending on the algorithm at hand.
+
+There are four major different types:
+1. =GenStage=
+2. =NDStage=
+3. =NNstage=
+4. =SimStage=
+
+=GenStage= is the root class for the classes that will generate a
+dataset.  This can be simulated data or simply taking a dataset and
+putting it in the correct place (again, for redo and this project
+structure).  =NDStage= will take in an =NxD= matrix and reduce its
+dimensionality to a lower one; one example for this would be PCA.
+=NNStage= can take the same input as =NDStage= (but usually takes the
+output of e. g. PCA) and will turn this into an =NxN=
+affinity/adjaceny matrix. This can then, in turn, be fed into the last
+one, =SimStage=. These types of classes take in both an =NxN= matrix
+and an =NxD= (=D=2=) array, that will serve as the initial layout.
+
+There are further minor classes, for examle simple classes that will
+rescale the input to have a predefined std or maximum scale (code in
+=jnb_msc/transformer/scale.py=).
+
+If anything is unclear, please let me know.
+
+* What are all those .do files?
+
+This repository uses [[https://github.com/apenwarr/redo/][redo]] to essentially “cache” the computations that
+are carried out by the experiments.  It works similar to `make` in
+that it tries to guess what files have been changed and what parts
+needs to be rebuilt.  I chose this approach so that I wouldn't have to
+either recompute everything every time or manually change the code to
+either load a (possibly stale) file or recompute it and save it.
+
+For more information, the notes on the original design are [[http://cr.yp.to/redo.html][here]].
+
+Unfortunately, this implementation is in python2 and hence needs to be
+installed separately.  It is not strictly necessary to install this
+library, but all the code to generate the figures uses this to check
+the presence (and staleness) of the files.  Furthermore, the =load()=
+and =save()= functions are written with redo in mind.
+
+For example, to get an image of t-SNE on MNIST, one could write in
+the root of the repository:
+#+begin_src sh
+redo 'data/mnist/pca/affinity/stdscale;f:1e-4/tsne/data.png'
+#+end_src
+The prefix =data/= is obligatory.  It can be omitted or it can be
+structured in any way.  The “effect” of the other folder names is
+shown in =jnb_msc/util.py=.  The names are resolved to classes.
+Further arguments, in colon-separated pairs, can be separated with a
+semicolon, for example =stdscale= will be called with =f=1e-4=.

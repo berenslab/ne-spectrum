@@ -103,7 +103,9 @@ if __name__ == "__main__":
     countfile = args.prefix.expanduser() / countfile
     X, stage = preprocess(metafile, countfile, line)
 
-    outputfile = "{}{}".format(args.type, "" if args.line is None else f"-{args.line}")
+    outputfile = "{}{}".format(
+        args.type, "" if args.line is None else f"-{args.line.lower()}"
+    )
 
     if args.outfmt == "pickle":
         import pickle

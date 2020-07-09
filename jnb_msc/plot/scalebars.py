@@ -122,7 +122,7 @@ def add_scalebar_frac(ax, frac_len=0.125, eps=0.5, only_x=True):
     xmin, xmax, *_ = ax.axis()
     l = round_pow10((xmax - xmin) * frac_len)
     lbl = str(int(l) if l >= 1 else l)
-    add_scalebar(
+    return add_scalebar(
         ax,
         matchx=False,
         matchy=False,

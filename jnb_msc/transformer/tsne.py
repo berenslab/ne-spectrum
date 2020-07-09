@@ -32,6 +32,7 @@ class TSNEStage(SimStage):
         n_iter=500,
         exaggeration=1,
         momentum=0.5,
+        negative_gradient_method="fft",
         n_jobs=-1,
         save_iter_freq=25,
     ):
@@ -46,6 +47,7 @@ class TSNEStage(SimStage):
         self.n_iter = n_iter
         self.exaggeration = exaggeration
         self.momentum = momentum
+        self.negative_gradient_method = negative_gradient_method
 
         self.n_jobs = n_jobs
         self.saver = TSNESaveEmbedding(self.outdir)
@@ -62,7 +64,7 @@ class TSNEStage(SimStage):
         tsne = TSNEEmbedding(
             embedding=self.init,
             affinities=affinities,
-            negative_gradient_method="fft",
+            negative_gradient_method=self.negative_gradient_method,
             learning_rate=self.learning_rate,
             n_jobs=self.n_jobs,
             random_state=self.random_state,
@@ -97,8 +99,9 @@ class TSNE(SimStage):
         late_exaggeration=1,
         early_momentum=0.5,
         late_momentum=0.8,
+        negative_gradient_method="fft",
         n_jobs=-1,
-        save_iter_freq=25,
+        save_iter_freq=250,
     ):
         self.early = TSNEStage(
             path,
@@ -110,6 +113,7 @@ class TSNE(SimStage):
             n_iter=early_n_iter,
             exaggeration=early_exaggeration,
             momentum=early_momentum,
+            negative_gradient_method=negative_gradient_method,
             n_jobs=n_jobs,
             save_iter_freq=save_iter_freq,
         )
@@ -124,6 +128,7 @@ class TSNE(SimStage):
             n_iter=late_n_iter,
             exaggeration=late_exaggeration,
             momentum=late_momentum,
+            negative_gradient_method=negative_gradient_method,
             n_jobs=n_jobs,
             save_iter_freq=save_iter_freq,
         )

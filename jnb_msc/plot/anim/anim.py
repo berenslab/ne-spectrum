@@ -5,7 +5,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import colors as mplclrs
 import matplotlib.animation as animation
+
 import sys
+import string
 from pathlib import Path
 
 
@@ -104,11 +106,14 @@ class ScatterAnimations(ScatterMultiple):
         dataname="data.flist",
         labelname=None,
         plotname="data.mp4",
+        titles=None,
+        suptitle=None,
         lim_eps=0.025,
         alpha=0.5,
         format="mp4",
         rc=None,
-        **kwargs
+        scalebars=None,
+        lettering=False,
         fps=50,
         dpi=100,
         **kwargs,
@@ -118,12 +123,16 @@ class ScatterAnimations(ScatterMultiple):
             dataname=dataname,
             labelname=labelname,
             plotname=plotname,
+            titles=titles,
             lim_eps=lim_eps,
             alpha=alpha,
             format=format,
             rc=rc,
-            **kwargs
+            scalebars=scalebars,
+            lettering=lettering,
+            **kwargs,
         )
+        self.suptitle = suptitle
         self.fps = fps
         self.dpi = dpi
         # if the wrong rc file has been loaded, try to rectify that
@@ -146,18 +155,27 @@ class ScatterAnimations(ScatterMultiple):
 
         with plt.rc_context(fname=self.rc):
             rows, cols = auto_layout(len(self.dataffiles))
-            titles = titles_from_paths(self.paths)
+            if self.titles is None:
+                self.titles = titles_from_paths(self.paths)
             fig, axs = plt.subplots(
                 nrows=rows,
                 ncols=cols,
                 figsize=(2 * cols, 2 * rows),
+                squeeze=False,
                 constrained_layout=True,
                 dpi=self.dpi,
                 **self.kwargs,
             )
 
+            try:
+                letter_iter = iter(self.lettering)
+            except TypeError:
+                letter_iter = string.ascii_lowercase
+
             scatters = []
-            for ax, data, title in zip(axs.flat, self.inits, titles):
+            for ax, data, title, letter in zip(
+                axs.flat, self.inits, self.titles, letter_iter
+            ):
                 d = rescale(data)
                 sc = ax.scatter(d[:, 0], d[:, 1], c=self.labels, alpha=self.alpha)
                 scatters.append(sc)
@@ -169,6 +187,12 @@ class ScatterAnimations(ScatterMultiple):
 
                 if title != "":
                     ax.set_title(title)
+
+                if self.lettering:
+                    self.add_lettering(ax, letter)
+
+            if self.suptitle is not None:
+                fig.suptitle(self.suptitle)
 
             fig.set_constrained_layout(False)
             sc_ani = animation.FuncAnimation(

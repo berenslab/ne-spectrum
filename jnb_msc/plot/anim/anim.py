@@ -23,7 +23,8 @@ class ScatterAnimation(ScatterSingle):
         alpha=0.5,
         format="png",
         rc=None,
-        **kwargs
+        fps=50,
+        **kwargs,
     ):
         super().__init__(
             path,
@@ -34,8 +35,9 @@ class ScatterAnimation(ScatterSingle):
             alpha=alpha,
             format=format,
             rc=rc,
-            **kwargs
+            **kwargs,
         )
+        self.fps = fps
         # if the wrong rc file has been loaded, try to rectify that
         if isinstance(self.rc, Path) and not self.rc.is_file():
             if (self.rc.parent.parent / "matplotlibrc").is_file():
@@ -76,7 +78,7 @@ class ScatterAnimation(ScatterSingle):
                 update_scatter,
                 frames=load_files(self.datafiles),
                 fargs=([sc],),
-                interval=50,
+                interval=self.fps,
                 blit=True,
                 init_func=lambda: [sc],
                 save_count=len(self.datafiles),
@@ -86,7 +88,7 @@ class ScatterAnimation(ScatterSingle):
             # expensive operation
             sc_ani.save(
                 str(self.plotname),
-                fps=50,
+                fps=self.fps,
                 metadata={"artist": "Niklas Böhm"},
                 savefig_kwargs={"transparent": True},
             )
@@ -107,6 +109,9 @@ class ScatterAnimations(ScatterMultiple):
         format="mp4",
         rc=None,
         **kwargs
+        fps=50,
+        dpi=100,
+        **kwargs,
     ):
         super().__init__(
             paths,
@@ -119,6 +124,8 @@ class ScatterAnimations(ScatterMultiple):
             rc=rc,
             **kwargs
         )
+        self.fps = fps
+        self.dpi = dpi
         # if the wrong rc file has been loaded, try to rectify that
         if isinstance(self.rc, Path) and not self.rc.is_file():
             if (self.rc.parent.parent / "matplotlibrc").is_file():
@@ -144,9 +151,9 @@ class ScatterAnimations(ScatterMultiple):
                 nrows=rows,
                 ncols=cols,
                 figsize=(2 * cols, 2 * rows),
-                dpi=300,
                 constrained_layout=True,
-                **self.kwargs
+                dpi=self.dpi,
+                **self.kwargs,
             )
 
             scatters = []
@@ -169,7 +176,7 @@ class ScatterAnimations(ScatterMultiple):
                 update_scatters,
                 frames=loader(self.dataffiles),
                 fargs=(scatters,),
-                interval=50,
+                interval=self.fps,
                 blit=True,
                 save_count=len(self.dataffiles[0]),
             )
@@ -178,7 +185,7 @@ class ScatterAnimations(ScatterMultiple):
             # expensive operation
             save = lambda f, anim: anim.save(
                 f.name,  # f is a NamedTemporaryFile
-                fps=50,
+                fps=self.fps,
                 metadata={"artist": "Niklas Böhm"},
                 extra_args=["-f", self.format],
             )

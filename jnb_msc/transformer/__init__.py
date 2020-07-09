@@ -7,7 +7,8 @@ from .fa2 import FA2
 from .random import RandomProjection, RandomUniform, RandomGauss
 from .spectral import Spectral
 from .umap import UMAP, UMAPDefault, UMAPKNN
-from .noack import AttractionRepulsionModel
+from .umap_bh import UMAPBH, TSNEElastic
+from .noack import AttractionRepulsionModel, BHARModel
 from .scale import (
     StdScale,
     MaxScale,

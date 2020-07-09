@@ -36,7 +36,7 @@ def tsne_from_rho(rho, dsrc):
 def correlate_dataset(dsrc, rhos, n_subsel=5000, random_state=None):
     if random_state is None:
         random_state = np.random.RandomState(555)
-    fa2 = dsrc / "ann/fa2/data.npy"
+    fa2 = dsrc / "ann/stdscale;f:1e3/fa2/data.npy"
     umap = dsrc / "umap_knn/maxscale;f:10/umap/data.npy"
 
     tsnes = [tsne_from_rho(rho, dsrc) for rho in rhos]

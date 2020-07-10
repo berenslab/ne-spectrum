@@ -26,13 +26,13 @@ if __name__ == "__main__":
 
     # passing a relative plotname will ensure that the plot will also
     # be saved in the data dir.
-    relname = sys.argv[2]
+    relname = Path(sys.argv[2])
     plotter = jnb_msc.plot.ExtPanelPlot(
         datafiles,
         corrs_f.absolute(),
         plotname=relname,
         titles=titles,
-        format="png",
+        format=relname.suffix.replace(".", ""),
         lo_exag=lo_exag,
         hi_exag=hi_exag,
     )

@@ -1,5 +1,4 @@
-This repository holds the code for NeurIPS submission done during my
-master's thesis.
+This repository holds the code for https://arxiv.org/abs/2007.08902: A Unifying Perspective on Neighbor Embeddings along the Attraction-Repulsion Spectrum.
 
 
 * Structure/Installation

@@ -457,6 +457,74 @@ class PlotRow(ScatterMultiple):
         self.fig, self.axs = fig, axs
         return fig, axs
 
+    @staticmethod
+    def row_datapaths(
+        datasource,
+        k=None,
+        perplexity=None,
+        k_ratio=2,
+        lo_exag=4,
+        hi_exag=30,
+        init=".",
+        fa2_scale="stdscale;f:1e3",
+    ):
+        """Return a pair of 5-tuples that are five common algorithms
+        on the same dataset.
+
+        Returns
+        -------
+        A pair of data filenames and titles."""
+        dsrc = Path(datasource)
+
+        ann_prefix = "ann" + ("" if k is None else f";n_neighbors:{k}")
+        umap_prefix = "umap_knn" + ("" if k is None else f";n_neighbors:{k}")
+
+        if fa2_scale is None:
+            fa2 = dsrc / ann_prefix / init / "fa2"
+        elif isinstance(fa2_scale, (int, float)):
+            fa2 = dsrc / ann_prefix / init / f"stdscale;f:{fa2_scale}" / "fa2"
+        else:
+            fa2 = dsrc / ann_prefix / init / fa2_scale / "fa2"
+        umap = dsrc / umap_prefix / init / "maxscale;f:10" / "umap"
+
+        tsne_prefix = "affinity"
+        if perplexity is not None:
+            tsne_prefix += f";perplexity:{perplexity}"
+        elif k is not None:
+            tsne_prefix += f";perplexity:{k_ratio*k}"
+
+        tsne = dsrc / tsne_prefix / init / "stdscale;f:1e-4" / "tsne/"
+        tsne4 = (
+            dsrc
+            / tsne_prefix
+            / init
+            / "stdscale;f:1e-4"
+            / f"tsne;late_exaggeration:{lo_exag}"
+        )
+        tsne30 = (
+            dsrc
+            / tsne_prefix
+            / init
+            / "stdscale;f:1e-4"
+            / f"tsne;early_exaggeration:{hi_exag};late_exaggeration:{hi_exag}"
+        )
+        tsnes = [tsne30, tsne4, tsne]
+
+        titles = [
+            "ForceAtlas2",
+            "UMAP",
+            # hack around to use the regular font for the numbers.
+            # This uses dejavu font for \rho, which sucks, but is
+            # hardly noticeable (fortunately).  The alternative would
+            # be to use the upright version of the correct font by
+            # specifying \mathdefault{\rho}
+            f"$\\rho = {{}}${hi_exag}",
+            f"$\\rho = {{}}${lo_exag}",
+            "t-SNE",
+        ]
+
+        return [fa2, umap] + tsnes, titles
+
 
 class SpectralVecs(ScatterMultiple):
     def __init__(

@@ -23,13 +23,14 @@ if __name__ == "__main__":
     titles = []
     for rs in repulsion_strengths:
         umap_runs.append(umap_prefix / f"umap;gamma:{rs}")
-        titles.append(f"$\\gamma = {{}}${rs:g}")
+        titles.append(f"$\\gamma = {rs:g}$")
 
     # passing a relative plotname will ensure that the plot will also
     # be saved in the data dir.
     relname = sys.argv[2]
-    plotter = jnb_msc.plot.PlotRow(
-        umap_runs, plotname=relname, titles=titles, format="pdf", scalebars=0.25
+    plotter = jnb_msc.plot.PlotMultWithTitle(
+        umap_runs, plotname=relname, titles=titles, format="pdf", scalebars=0.25,
+        figwidth=6.97,
     )
     filedeps = set(
         [
@@ -43,7 +44,7 @@ if __name__ == "__main__":
 
     jnb_msc.redo.redo_ifchange(list(filedeps) + datadeps)
     plotter.load()
-    fig, axs = plotter.transform()
+    figs = plotter.transform()
     plotter.save()
 
     # link to the result

@@ -16,12 +16,19 @@ if __name__ == "__main__":
     dsrc = Path("../data/treutlein_409b2")
 
     datafiles, titles = jnb_msc.plot.SixPanelPlot.panel_datapaths(dsrc)
+    corr_f = Path("../stats/thuman_corr.csv")
 
     # passing a relative plotname will ensure that the plot will also
     # be saved in the data dir.
     relname = sys.argv[2]
-    plotter = jnb_msc.plot.SixPanelPlot(
-        datafiles, plotname=relname, titles=titles, format="pdf"
+    plotter = jnb_msc.plot.SixPanelPlotsExt(
+        datafiles,
+        corr_f.absolute(),
+        plotname=relname,
+        titles=titles,
+        format="pdf",
+        lettering=True,
+        figwidth=1.625,
     )
     filedeps = set(
         [
@@ -33,10 +40,10 @@ if __name__ == "__main__":
 
     datadeps = plotter.get_datadeps()
 
-    redo.redo_ifchange(list(filedeps) + datadeps)
+    redo.redo_ifchange(list(filedeps) + datadeps + [corr_f])
     plotter.load()
     plotter.data[0][:, 1] *= -1
-    fig, axs = plotter.transform()
+    plotter.transform()
     plotter.save()
 
     # link to the result

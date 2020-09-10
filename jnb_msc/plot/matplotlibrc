@@ -14,10 +14,10 @@ figure.dpi         : 600         ## figure dots per inch
 #figure.edgecolor   : white     ## figure edgecolor
 #figure.frameon     : True      ## enable figure frame
 
-font.size : 6
-font.family : Arial, Helvetica, sans-serif
-font.sans-serif : Arial, Helvetica, sans-serif
-font.serif : TeX Gyre Termes
+font.size : 9
+# font.family : Arial, Helvetica, sans-serif
+# font.sans-serif : Arial, Helvetica, sans-serif
+# font.serif : TeX Gyre Termes
 axes.titlesize : larger
 axes.titlepad : 3
 axes.linewidth : .3
@@ -34,8 +34,7 @@ legend.fancybox : False
 
 axes.unicode_minus : True
 text.usetex: False
-text.latex.unicode : False
-# text.latex.preamble : "\\usepackage{amsmath}"
+# text.latex.preamble : "\\\\newcommand{\\\\mathdefault}[1]{#1}"
 
 mathtext.it : sans:italic
 mathtext.rm : sans

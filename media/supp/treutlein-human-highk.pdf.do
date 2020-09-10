@@ -18,12 +18,23 @@ if __name__ == "__main__":
     datafiles, titles = jnb_msc.plot.SixPanelPlot.panel_datapaths(
         dsrc, k=150, lo_exag=3, hi_exag=20
     )
+    spectral, fa2, umap, tsne, tsne4, tsne30 = datafiles
+    datafiles = [spectral, tsne30, tsne4, tsne, fa2, umap]
+
+    spectral, fa2, umap, tsne, tsne4, tsne30 = titles
+    titles = [spectral, tsne30, tsne4, tsne, fa2, umap]
+
 
     # passing a relative plotname will ensure that the plot will also
     # be saved in the data dir.
     relname = sys.argv[2]
-    plotter = jnb_msc.plot.SixPanelPlot(
-        datafiles, plotname=relname, titles=titles, format="pdf"
+    plotter = jnb_msc.plot.PlotMultWithTitle(
+        datafiles,
+        plotname=relname,
+        titles=titles,
+        format="pdf",
+        figwidth=1.5,
+        scalebars=0.25,
     )
     filedeps = set(
         [

@@ -32,8 +32,8 @@ if __name__ == "__main__":
     # passing a relative plotname will ensure that the plot will also
     # be saved in the data dir.
     relname = sys.argv[2]
-    plotter = jnb_msc.plot.PlotRow(
-        datafiles, plotname=relname, titles=titles, format="pdf", scalebars=0.2
+    plotter = jnb_msc.plot.PlotMultWithTitle(
+        datafiles, plotname=relname, titles=titles, format="pdf", scalebars=0.2, figwidth=1.5,
     )
     filedeps = set(
         [
@@ -47,7 +47,7 @@ if __name__ == "__main__":
 
     redo.redo_ifchange(list(filedeps) + datadeps)
     plotter.load()
-    fig, axs = plotter.transform()
+    figs = plotter.transform()
     plotter.save()
 
     # link to the result

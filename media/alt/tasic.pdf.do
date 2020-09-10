@@ -30,7 +30,7 @@ if __name__ == "__main__":
     # passing a relative plotname will ensure that the plot will also
     # be saved in the data dir.
     relname = Path(sys.argv[2])
-    plotter = jnb_msc.plot.ExtPanelPlot(
+    plotter = jnb_msc.plot.SixPanelPlotsExt(
         datafiles,
         corrs_f.absolute(),
         plotname=relname,
@@ -38,6 +38,7 @@ if __name__ == "__main__":
         format=relname.suffix.replace(".", ""),
         lo_exag=lo_exag,
         hi_exag=hi_exag,
+        figwidth=1.625,
     )
     filedeps = set(
         [
@@ -53,7 +54,7 @@ if __name__ == "__main__":
     plotter.load()
     shape = plotter.data[0].shape
     plotter.data[0] += plotter.random_state.normal(0, 1e-4, size=shape)
-    fig, axs = plotter.transform()
+    figs = plotter.transform()
     plotter.save()
 
     # link to the result

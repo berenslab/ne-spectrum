@@ -19,7 +19,7 @@ class AnchoredScaleBar(AnchoredOffsetbox):
         sizey=0,
         labelx=None,
         labely=None,
-        loc=4,
+        loc="lower right",
         pad=0.1,
         borderpad=0.1,
         sep=2,
@@ -61,7 +61,9 @@ class AnchoredScaleBar(AnchoredOffsetbox):
             )
 
         if sizex and labelx:
-            self.xlabel = TextArea(labelx, minimumdescent=False)
+            self.xlabel = TextArea(
+                labelx, minimumdescent=False, textprops=dict(usetex=True)
+            )
             bars = VPacker(children=[bars, self.xlabel], align="center", pad=0, sep=sep)
         if sizey and labely:
             self.ylabel = TextArea(labely)
@@ -108,8 +110,10 @@ def add_scalebar(ax, matchx=True, matchy=True, hidex=True, hidey=True, **kwargs)
 
     if hidex:
         ax.xaxis.set_visible(False)
+        ax.tick_params(left=False, labelleft=False)
     if hidey:
         ax.yaxis.set_visible(False)
+        ax.tick_params(bottom=False, labelbottom=False)
     if hidex and hidey:
         ax.set_frame_on(False)
 

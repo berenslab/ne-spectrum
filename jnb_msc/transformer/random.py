@@ -35,9 +35,6 @@ class RandomGauss(NDStage):
     """A random init for other dimensionality reduction algorithms."""
 
     def transform(self):
-        t = GaussianRandomProjection(
-            n_components=self.n_components, random_state=self.random_state
-        )
         self.data_ = self.random_state.normal(
             size=(self.data.shape[0], self.n_components)
         )

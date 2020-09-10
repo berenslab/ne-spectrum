@@ -15,6 +15,12 @@ import string
 import inspect
 import os
 
+mdata = {
+    "Creator": None,
+    "Producer": None,
+    "CreationDate": None
+}
+
 
 class ScatterMultiple(ProjectBase):
     """Takes a list of paths and creates a scatter plot from the
@@ -149,6 +155,39 @@ class ScatterMultiple(ProjectBase):
     def save(self):
         save = lambda f, data: data.savefig(f, format=self.format)
         self.save_lambda(self.plotname, self.fig, save)
+        # self.save_tex(self.fig, self.plotname)
+
+    def save_tex(self, fig, name):
+        name_stripped = str(name.name).split(".", 1)[0]
+        savename = Path(name_stripped).with_suffix(".tex")
+        modfile = Path(inspect.getmodule(type(self)).__file__).parent
+        thesisdir = modfile / "../../../mthesis/figures/research"
+        # fig.savefig(thesisdir / savename, format="pgf")
+
+        for i, ax in enumerate(fig.get_axes()):
+            # fig.canvas.draw()
+            # extent = ax.get_tightbbox(fig.canvas.get_renderer())
+            extent = ax.get_window_extent()
+            if extent is None:
+                continue
+            extent = extent.transformed(fig.dpi_scale_trans.inverted())
+            # fig.set_constrained_layout_pads(w_pad=0, h_pad=0, wspace=0, hspace=0)
+            fig.savefig(
+                Path("/tmp") / (name_stripped + f"-{i}.pdf"),
+                bbox_inches=extent,
+                pad_inches=0,
+                dpi="figure",
+            )
+            fig.savefig(
+                Path("/tmp") / (name_stripped + f"-{i}.png"),
+                bbox_inches=extent,
+                pad_inches=0,
+                dpi="figure",
+            )
+            fig.savefig(
+                Path("/tmp") / (name_stripped + f"-{i}.pgf"), bbox_inches=extent,
+            )
+        fig.savefig(Path("/tmp") / (name_stripped + ".pdf"))
 
     @staticmethod
     def add_inset_legend(ax, data, labels, to_str=str, textprops=None, posfun="mean"):
@@ -179,13 +218,15 @@ class ScatterMultiple(ProjectBase):
 
         other_title = ax.get_title("center")
         newlines = len(other_title.split("\n")) - 1
-        ax.set_title(letter + newlines * "\n", fontdict=fontdict, loc=loc, **kwargs)
+        ax.set_title(
+            f"({letter})" + newlines * "\n", fontdict=fontdict, loc=loc, **kwargs
+        )
 
     @staticmethod
     def get_letterdict():
         return {
-            "fontsize": "x-large",
-            "fontweight": "bold",
+            # "fontsize": "x-large",
+            # "fontweight": "bold",
         }
 
 
@@ -234,6 +275,8 @@ class SixPanelPlot(ScatterMultiple):
         alpha=0.5,
         format="png",
         rc=None,
+        figwidth=5.5,  # in inches
+        figheight=None,
         scalebars=0.25,
         **kwargs,
     ):
@@ -247,6 +290,8 @@ class SixPanelPlot(ScatterMultiple):
             alpha=alpha,
             format=format,
             rc=rc,
+            figwidth=figwidth,
+            figheight=figheight,
             scalebars=scalebars,
             **kwargs,
         )
@@ -271,20 +316,20 @@ class SixPanelPlot(ScatterMultiple):
             t_sp, t_fa, t_umap, *t_tsne = self.titles
 
             axs[0, 0].set_label("spectral")
-            axs[0, 0].set_title(t_sp)
+            axs[0, 0].set_title(t_sp, loc="right", y=1)
             axs[0, 0].scatter(
                 spectral[:, 0], spectral[:, 1], c=labels, alpha=alpha, rasterized=True
             )
-            axs[0, 3].set_title(t_tsne[0])
+            axs[0, 3].set_title(t_tsne[0], y=1)
             axs[0, 3].scatter(
                 tsne[:, 0], tsne[:, 1], c=labels, alpha=alpha, rasterized=True
             )
 
-            axs[1, 1].set_title(t_fa)
+            axs[1, 1].set_title(t_fa, y=1)
             axs[1, 1].scatter(
                 fa2[:, 0], fa2[:, 1], c=labels, alpha=alpha, rasterized=True
             )
-            axs[1, 2].set_title(t_umap)
+            axs[1, 2].set_title(t_umap, y=1)
             axs[1, 2].scatter(
                 umap[:, 0], umap[:, 1], c=labels, alpha=alpha, rasterized=True
             )
@@ -296,7 +341,7 @@ class SixPanelPlot(ScatterMultiple):
             ):
                 ax = fig.add_subplot(g, zorder=5)
                 exag_axs.append(ax)
-                ax.set_title(title)
+                ax.set_title(title, y=1)
                 ax.scatter(
                     data[:, 0], data[:, 1], c=labels, alpha=alpha, rasterized=True
                 )
@@ -308,18 +353,17 @@ class SixPanelPlot(ScatterMultiple):
 
             for ax in fig.get_axes():
                 set_aspect_center(ax)
-                if (
-                    self.scalebars
-                    and ax.get_label() != "spectral"
-                    and ax.get_label() != "legend"
-                ):
-                    self.add_lettering(ax, next(letter_iter))
-                    self.add_scalebar(ax, self.scalebars)
+                if ax.get_label() != "spectral" and ax.get_label() != "legend":
+                    if self.lettering:
+                        self.add_lettering(ax, next(letter_iter))
+                    if self.scalebars:
+                        self.add_scalebar(ax, self.scalebars)
                 elif ax.get_label() == "spectral":
                     ax.xaxis.set_visible(False)
                     ax.yaxis.set_visible(False)
                     ax.set_frame_on(False)
-                    self.add_lettering(ax, next(letter_iter))
+                    if self.lettering:
+                        self.add_lettering(ax, next(letter_iter))
                 elif ax.get_label() == "legend":
                     ax.xaxis.set_visible(False)
                     ax.yaxis.set_visible(False)
@@ -399,18 +443,26 @@ class SixPanelPlot(ScatterMultiple):
         )
         tsnes = [tsne, tsne4, tsne30]
 
+        # titles = [
+        #     "Laplacian Eigenmaps",
+        #     "ForceAtlas2",
+        #     "UMAP",
+        #     "t-SNE",
+        #     # hack around to use the regular font for the numbers.
+        #     # This uses dejavu font for \rho, which sucks, but is
+        #     # hardly noticeable (fortunately).  The alternative would
+        #     # be to use the upright version of the correct font by
+        #     # specifying \mathdefault{\rho}
+        #     f"$\\rho = {{}}${lo_exag}",
+        #     f"$\\rho = {{}}${hi_exag}",
+        # ]
         titles = [
-            "Laplacian Eigenmaps",
-            "ForceAtlas2",
-            "UMAP",
-            "t-SNE",
-            # hack around to use the regular font for the numbers.
-            # This uses dejavu font for \rho, which sucks, but is
-            # hardly noticeable (fortunately).  The alternative would
-            # be to use the upright version of the correct font by
-            # specifying \mathdefault{\rho}
-            f"$\\rho = {{}}${lo_exag}",
-            f"$\\rho = {{}}${hi_exag}",
+            "\gls{le}",
+            "\gls{fa2}",
+            "\gls{umap}",
+            "\gls{tsne}",
+            f"\gls{{tsne}}, $\\rho = {lo_exag}$",
+            f"\gls{{tsne}} $\\rho = {hi_exag}$",
         ]
 
         return [spectral, fa2, umap] + tsnes, titles
@@ -593,6 +645,70 @@ class SpectralVecs(ScatterMultiple):
 
         self.fig, self.axs = fig, axs
         return fig, axs
+
+class SpectralVecsFigs(SpectralVecs):
+
+    def transform(self):
+        spectral = self.data[0]
+
+        if self.titles is None:
+            titles = [f"Eigs ${i+1}/{i+2}$" for i in range(spectral.shape[1] - 1)]
+        else:
+            titles = self.titles
+        self.titles = titles
+
+        rows, cols = auto_layout(spectral.shape[1] - 1)
+        blocksize = self.figwidth
+        figs = []
+
+        with plt.rc_context(fname=self.rc):
+
+            for i, title in enumerate(titles):
+                fig, ax = plt.subplots(
+                    figsize=(blocksize, blocksize),
+                    constrained_layout=True,
+                    **self.kwargs,
+                )
+
+                ax.scatter(
+                    spectral[:, i],
+                    spectral[:, i + 1],
+                    c=self.labels,
+                    alpha=self.alpha,
+                    rasterized=True,
+                )
+                ax.get_xaxis().set_visible(False)
+                ax.get_yaxis().set_visible(False)
+                for a in ["top", "bottom", "left", "right"]:
+                    ax.spines[a].set_visible(False)
+                ax.tick_params(
+                    labelbottom=False, bottom=False, labelleft=False, left=False
+                )
+
+                figs.append(fig)
+
+        # self.fig, self.axs = fig, axs
+        self.figs = figs
+        return figs, None
+
+    def save(self):
+        name_key = str(self.plotname.name).split(".", 1)[0]
+
+        # this is the path relative to the source code, because that's
+        # constant for all users of this interface.
+        modfile = Path(inspect.getmodule(type(self)).__file__).parent
+        thesisdir = modfile / "../../../mthesis/figures/forces/"
+
+        savedir = thesisdir / name_key
+        savedir.mkdir(parents=True, exist_ok=True)
+        self.savedir = savedir
+        self.name_key = name_key
+
+        for i, (fig, title) in enumerate(zip(self.figs, self.titles)):
+            fig.savefig(savedir / f"{name_key}-{i}.{self.format}",
+                        format=self.format, metadata=mdata)
+            if title is not None:
+                (savedir / f"{name_key}-{i}.tex").write_text(title + "\n")
 
 
 class ExtPanelPlot(SixPanelPlot):
@@ -897,3 +1013,181 @@ def despine(ax):
     """Remove the upper and right axes border."""
     ax.spines["right"].set_visible(False)
     ax.spines["top"].set_visible(False)
+
+
+class SixPanelPlots(SixPanelPlot):
+    """Plots the "six panels" separately, each as a figure."""
+
+    def transform(self):
+        # reorganize the plot order to have correct numbering
+        spectral, fa2, umap, tsne, tsne4, tsne30 = self.data
+        self.data = [spectral, tsne30, tsne4, tsne, fa2, umap]
+
+        spectral, fa2, umap, tsne, tsne4, tsne30 = self.titles
+        self.titles = [spectral, tsne30, tsne4, tsne, fa2, umap]
+
+        if self.titles is None:
+            self.titles = [None] * len(self.data)
+        labels = self.labels
+        alpha = self.alpha
+
+        # width_inch = self.figwidth
+        # rows = 2
+        # cols = 4
+        # box_inch = width_inch / cols
+        box_inch = self.figwidth
+        self.figs = []
+        with plt.rc_context(fname=self.rc):
+            for data, title in zip(self.data, self.titles):
+                fig, ax = plt.subplots(figsize=(box_inch, box_inch))
+                fig.subplots_adjust(0, 0, 1, 1)
+                ax.scatter(data[:, 0], data[:, 1], c=labels, rasterized=True)
+                set_aspect_center(ax)
+                if self.scalebars and title is not None and title.startswith(r'\gls{le}'):
+                    ax.get_xaxis().set_visible(False)
+                    ax.get_yaxis().set_visible(False)
+                    for a in ["top", "bottom", "left", "right"]:
+                        ax.spines[a].set_visible(False)
+                    ax.tick_params(
+                        labelbottom=False, bottom=False, labelleft=False, left=False
+                    )
+                elif self.scalebars:
+                    ax.get_xaxis().set_visible(False)
+                    ax.get_yaxis().set_visible(False)
+                    ax.tick_params(
+                        labelbottom=False, bottom=False, labelleft=False, left=False
+                    )
+                    self.add_scalebar(ax, self.scalebars)
+                else:
+                    despine(ax)
+                self.figs.append(fig)
+
+        return self.figs
+
+    def save(self):
+        name_key = str(self.plotname.name).split(".", 1)[0]
+
+        # this is the path relative to the source code, because that's
+        # constant for all users of this interface.
+        modfile = Path(inspect.getmodule(type(self)).__file__).parent
+        thesisdir = modfile / "../../../mthesis/figures/forces/"
+
+        savedir = thesisdir / name_key
+        savedir.mkdir(parents=True, exist_ok=True)
+        self.savedir = savedir
+        self.name_key = name_key
+
+        for i, fig in enumerate(self.figs):
+            fig.savefig(savedir / f"{name_key}-{i}.{self.format}", format=self.format, metadata=mdata)
+
+class SixPanelPlotsExt(SixPanelPlots):
+    """Mirrors the API of SixPanelPlotExt but exports the csv and plots
+    as separate Figures."""
+
+    def __init__(
+        self,
+        paths,
+        corr_fname,
+        dataname=None,
+        labelname=None,
+        plotname=None,
+        titles=None,
+        lim_eps=0.025,
+        alpha=0.5,
+        format="png",
+        rc=None,
+        scalebars=0.25,
+        lo_exag=None,
+        hi_exag=None,
+        **kwargs,
+    ):
+        super().__init__(
+            paths,
+            dataname=dataname,
+            labelname=labelname,
+            plotname=plotname,
+            titles=titles,
+            lim_eps=lim_eps,
+            alpha=alpha,
+            format=format,
+            rc=rc,
+            scalebars=scalebars,
+            **kwargs,
+        )
+        self.corr_fname = (
+            corr_fname if corr_fname.is_absolute() else self.path / corr_fname
+        )
+        self.lo_exag = lo_exag
+        self.hi_exag = hi_exag
+
+    def save(self):
+        import shutil
+
+        super().save()
+        if self.titles is not None:
+            for i, title in enumerate(self.titles):
+                if title is not None:
+                    (self.savedir / f"{self.name_key}-{i}.tex").write_text(title)
+
+        shutil.copy(self.corr_fname,
+                    self.savedir / Path(self.name_key).with_suffix('.csv'))
+
+class PlotMultWithTitle(ScatterMultiple):
+
+    def transform(self):
+
+        if self.titles is None:
+            self.titles = [None] * len(self.data)
+        labels = self.labels
+        alpha = self.alpha
+
+        box_inch = self.figwidth
+
+        self.figs = []
+        spectrals = [title == r"\gls{le}" for title in self.titles]
+
+        with plt.rc_context(fname=self.rc):
+            for data, title, spectral in zip(self.data, self.titles, spectrals):
+                fig, ax = plt.subplots(figsize=(box_inch, box_inch))
+                fig.subplots_adjust(0, 0, 1, 1)
+                ax.scatter(data[:, 0], data[:, 1], c=labels, alpha=alpha, rasterized=True)
+                set_aspect_center(ax)
+                if spectral and self.scalebars:
+                    spectral = False
+                    ax.get_xaxis().set_visible(False)
+                    ax.get_yaxis().set_visible(False)
+                    for a in ["top", "bottom", "left", "right"]:
+                        ax.spines[a].set_visible(False)
+                    ax.tick_params(
+                        labelbottom=False, bottom=False, labelleft=False, left=False
+                    )
+                elif self.scalebars:
+                    ax.get_xaxis().set_visible(False)
+                    ax.get_yaxis().set_visible(False)
+                    ax.tick_params(
+                        labelbottom=False, bottom=False, labelleft=False, left=False
+                    )
+                    self.add_scalebar(ax, self.scalebars)
+                else:
+                    despine(ax)
+                self.figs.append(fig)
+
+        return self.figs
+
+    def save(self):
+        name_key = str(self.plotname.name).split(".", 1)[0]
+
+        # this is the path relative to the source code, because that's
+        # constant for all users of this interface.
+        modfile = Path(inspect.getmodule(type(self)).__file__).parent
+        thesisdir = modfile / "../../../mthesis/figures/forces/"
+
+        savedir = thesisdir / name_key
+        savedir.mkdir(parents=True, exist_ok=True)
+        self.savedir = savedir
+        self.name_key = name_key
+
+        for i, (fig, title) in enumerate(zip(self.figs, self.titles)):
+            fig.savefig(savedir / f"{name_key}-{i}.{self.format}", format=self.format, metadata=mdata)
+            if title is not None:
+                (savedir / f"{name_key}-{i}.tex").write_text(title + "\n")

@@ -18,12 +18,18 @@ if __name__ == "__main__":
     datafiles, titles = jnb_msc.plot.SixPanelPlot.panel_datapaths(
         dsrc, lo_exag=7, hi_exag=40
     )
+    corr_f = Path('../../stats/tchimp_corr.csv')
 
     # passing a relative plotname will ensure that the plot will also
     # be saved in the data dir.
     relname = sys.argv[2]
-    plotter = jnb_msc.plot.SixPanelPlot(
-        datafiles, plotname=relname, titles=titles, format="pdf"
+    plotter = jnb_msc.plot.SixPanelPlotsExt(
+        datafiles,
+        corr_f.absolute(),
+        plotname=relname,
+        titles=titles,
+        format="pdf",
+        figwidth=1.625,
     )
     filedeps = set(
         [
@@ -35,7 +41,7 @@ if __name__ == "__main__":
 
     datadeps = plotter.get_datadeps()
 
-    redo.redo_ifchange(list(filedeps) + datadeps)
+    redo.redo_ifchange(list(filedeps) + datadeps + [corr_f])
     plotter.load()
     # fix spectral embedding to be consistent with the other scatters
     plotter.data[0] *= -1

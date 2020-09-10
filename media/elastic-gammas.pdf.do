@@ -40,7 +40,7 @@ if __name__ == "__main__":
         )
 
         g = 1 / gamma  # format_gamma(gamma)
-        titles.append(f"$\\gamma=\\mathdefault{{{g:g}}}$")
+        titles.append(f"$\\gamma={{{g:g}}}$")
 
     prep = "tsnee;early_exaggeration:1;elastic_const:10000;learning_rate:1;eps:1/"
     for gamma in [100, 1]:
@@ -56,16 +56,17 @@ if __name__ == "__main__":
         )
 
         g = 1 / gamma
-        titles.append(f"$\\gamma=\\mathdefault{{{g:g}}}$, EE")
+        titles.append(f"$\\gamma={{{g:g}}}$, \\textsc{{ee}}")
 
     relname = sys.argv[2]
-    plotter = jnb_msc.plot.PlotRow(
+    plotter = jnb_msc.plot.PlotMultWithTitle(
         datapaths,
         plotname=relname,
         titles=titles,
         format="pdf",
         scalebars=0.3,
-        figheight=1.1,  # 1.25
+        # figheight=1.1,  # 1.25
+        figwidth=1.33824,
     )
     filedeps = set(
         [
@@ -79,7 +80,7 @@ if __name__ == "__main__":
 
     jnb_msc.redo.redo_ifchange(list(filedeps) + datadeps)
     plotter.load()
-    fig, axs = plotter.transform()
+    figs = plotter.transform()
     plotter.save()
 
     # link to the result

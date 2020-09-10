@@ -66,15 +66,25 @@ if __name__ == "__main__":
     dsrc = Path("../data/gauss_devel")
     init_name = "random"
 
-    datafiles, titles = panel_datapaths(  # jnb_msc.plot.SixPanelPlot.
+    datafiles, titles = jnb_msc.plot.SixPanelPlot.panel_datapaths(  # jnb_msc.plot.SixPanelPlot.
         dsrc, hi_exag=30, lo_exag=2, init=init_name
     )
+
+    spectral, fa2, umap, tsne, tsne4, tsne30 = datafiles
+    name = tsne30.name
+    tsne30 = tsne30.parent / (name + ';random_state:12344')
+    datafiles = [spectral, tsne30, tsne4, tsne, fa2, umap]
+
+    spectral, fa2, umap, tsne, tsne4, tsne30 = titles
+    titles = [spectral, tsne30, tsne4, tsne, fa2, umap]
 
     # passing a relative plotname will ensure that the plot will also
     # be saved in the data dir.
     relname = sys.argv[2]
-    plotter = jnb_msc.plot.SixPanelPlot(
-        datafiles, plotname=relname, titles=titles, format="pdf", alpha=0.5
+    plotter = jnb_msc.plot.PlotMultWithTitle(
+        datafiles, plotname=relname, titles=titles, format="pdf",
+        scalebars=.15,
+        figwidth=1.625
     )
     filedeps = set(
         [

@@ -10,6 +10,8 @@ import dcor
 import scipy
 import subprocess
 
+import tikzplotlib
+
 import numpy as np
 import pandas as pd
 import matplotlib as mpl
@@ -196,7 +198,7 @@ def plot_z(df, fig=None, ax=None, color="xkcd:dark grey"):
 
 
 def plot_corr_heatmap(
-    df, fig=None, ax=None, cax=None, cmap="plasma", xtickstep=6, ytickstep=6
+        df, fig=None, ax=None, cax=None, cmap="plasma", xtickstep=6, ytickstep=6, aspect=100
 ):
     if fig is None:
         fig, [cax, ax] = plt.subplots(
@@ -229,10 +231,13 @@ def plot_corr_heatmap(
     ax.set_yticklabels([f"{rho:g}" for rho in df.index[yix]])
 
     cbar = fig.colorbar(
-        mat, cax=cax, ax=ax, orientation="vertical", aspect=100, shrink=0.75
+        mat, cax=cax, ax=ax, orientation="vertical", aspect=aspect, shrink=0.75
     )
+    cticks = [0.95, 1]
+    cbar.set_ticks([0.95, 1])
+    cbar.set_ticklabels([str(l) for l in cticks])
     cbar.set_label("Dist. corr.", labelpad=-4)
-    return fig, ax
+    return fig, ax, cbar
 
 
 if __name__ == "__main__":
@@ -300,3 +305,4 @@ if __name__ == "__main__":
     subprocess.call(["rsvg-convert", "-f", "pdf", "-o", sys.argv[3], alt_out])
     # fig.savefig(sys.argv[3], format="pdf", bbox_inches="tight")
     fig.savefig(sys.argv[2] + ".png", format="png", bbox_inches="tight")
+    # tikzplotlib.save(f"/tmp/{sys.argv[2]}.tex", fig)

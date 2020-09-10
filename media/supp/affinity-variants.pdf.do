@@ -24,11 +24,13 @@ if __name__ == "__main__":
     a, b = find_ab_params(spread, min_dist)
 
     umap = dsrc / "umap_knn/maxscale;f:10/umap"
+    umap_eps = dsrc / "umap_knn/maxscale;f:10/umap;eps:1"
     umap_default = dsrc / f"umap_knn/spectral/maxscale;f:10/umap;a:{a};b:{b}"
     umap_knn = dsrc / knn_prefix / "maxscale;f:10/umap"
     umap_knn_eps = dsrc / knn_prefix / "maxscale;f:10/umap;eps:1"
     fa2 = dsrc / "ann/fa2;use_degrees:0"
     fa2_degrep = dsrc / "ann/fa2"
+    spectral = dsrc / "ann/spectral"
 
     dpaths = [
         tsne_default,
@@ -39,28 +41,32 @@ if __name__ == "__main__":
         umap,
         umap_knn,
         umap_knn_eps,
+        spectral,
+        umap_eps,
     ]
     titles = [
-        "Default t-SNE\n",
-        "t-SNE,\nkNN affin. ($k={}$15)",
-        "FA2,\nRepulsion by degree",
-        "FA2,\nFixed repulsion",
-        "Default UMAP\n",
-        "UMAP, $\mathit{a}=b=\mathdefault{1}$\n",
-        "UMAP,\n$a=b=\mathdefault{1}$, kNN affin.",
-        "UMAP,\n$a=b=\mathdefault{1}$, kNN affin., $\epsilon=\mathdefault{1}$",
+        "Default \gls{tsne}\n",
+        "\gls{knn} \gls{tsne}",
+        "\gls{fa2},\nrepulsion by degree",
+        "\gls{fa2},\nfixed repulsion",
+        "Default \gls{umap}\n",
+        "\gls{umap}, ${a}=b={1}$\n",
+        "\gls{knn} \gls{umap},\n$a=b={1}$",
+        "\gls{knn} \gls{umap},\n$a=b={1}$, $\epsilon={1}$",
+        "\gls{le}",
+        "\gls{umap}, ${a}=b={1}$, $\epsilon=1$\n",
     ]
 
     # passing a relative plotname will ensure that the plot will also
     # be saved in the data dir.
     relname = sys.argv[2]
-    plotter = jnb_msc.plot.ScatterMultiple(
+    plotter = jnb_msc.plot.PlotMultWithTitle(
         dpaths,
         plotname=relname,
         titles=titles,
         format="pdf",
         scalebars=0.25,
-        figheight=3,
+        figwidth=1.5,
     )
     filedeps = set(
         [
@@ -76,7 +82,8 @@ if __name__ == "__main__":
     plotter.load()
     # flip the default UMAP with LE init
     plotter.data[4][:, 1] *= -1
-    fig, axs = plotter.transform()
+    plotter.data[-2] *= -1
+    figs = plotter.transform()
     #
 
     # with plt.rc_context(fname=plotter.rc):

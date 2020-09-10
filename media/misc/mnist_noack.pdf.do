@@ -22,13 +22,13 @@ if __name__ == "__main__":
 
     for r in range(0, -3, -1):
         for a in range(0, 3):
-            title = f"({a}, {r})\n"
+            title = f"$({a}, {r})$, " + r"\\"
             if a == 2 and r == -1:
-                title = "FR, " + title
+                title = r"\gls{fr}, " + title
             elif a == 1 and r == -1:
-                title = "FA2, " + title
+                title = r"\gls{fa2}, " + title
             elif a == 0 and r == -1:
-                title = "LL, " + title
+                title = r"\textsc{ll}, " + title
 
             # if (a == 0 and r == -1) or (a == 1 and r == 0):
             #     std = 1000
@@ -49,7 +49,7 @@ if __name__ == "__main__":
                 n_iter = 750
 
             src = dsrc / f"stdscale;f:{std}"
-            title += f"$\\sigma=${std}, "
+            title += f"$\\sigma={std}$, "
 
             if a != 1 or r != -1:
                 run = f"noack;a:{a};r:{r};n_iter:{n_iter};save_iter_freq:1"
@@ -70,13 +70,13 @@ if __name__ == "__main__":
             else:
                 lr = 0.1  # default
             run += f";learning_rate:{lr}" if lr != 0.1 else ""
-            title += f"$\\eta=${lr}, "
+            title += f"$\\eta={lr}$, "
 
             if a > 0 and r == -2:
                 eps = 0.1
             else:
                 eps = 0
-            title += f"$\\epsilon=${eps}, " if eps != 0 else ""
+            title += f"$\\epsilon={eps}$, " if eps != 0 else ""
             run += f";eps:{eps}" if eps != 0 else ""
 
             if title.endswith(", "):
@@ -91,14 +91,15 @@ if __name__ == "__main__":
     letters = "x" + string.ascii_lowercase
 
     relname = Path(sys.argv[2])
-    plotter = jnb_msc.plot.ScatterMultiple(
+    plotter = jnb_msc.plot.PlotMultWithTitle(
         datapaths,
         plotname=relname,
         titles=titles,
         format=relname.suffix.replace(".", ""),
         scalebars=0.3,
         lettering=letters,
-        alpha=0.5,
+        alpha=1,
+        figwidth=1.5
     )
     filedeps = set(
         [
@@ -112,12 +113,14 @@ if __name__ == "__main__":
 
     jnb_msc.redo.redo_ifchange(list(filedeps) + datadeps)
     plotter.load()
-    fig, axs = plotter.transform()
+    figs = plotter.transform()
     with plt.rc_context(fname=plotter.rc):
-        axs.flat[0].remove()
-        tprops = {"size": "x-large"}
+        figs[0].get_axes()[0].remove()
+        # tprops = {"size": "x-large"}
+        tprops = {"usetex": True}
         plotter.add_inset_legend(
-            axs.flat[4], plotter.data[4], plotter.labels, textprops=tprops
+            figs[4].get_axes()[0], plotter.data[4], plotter.labels,
+            textprops=tprops,
         )
     plotter.save()
 

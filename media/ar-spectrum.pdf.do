@@ -50,6 +50,7 @@ def plot_spectrum(
     spectral, fa2, umap, tsne, tsne4, tsne30, tsne100, tsnehalf, labels, alpha=0.3
 ):
     width_inch = 5.5  # text (and thus fig) width of nips
+    width_inch = 6.97  # width for my thesis
     rows = 2
     cols = 6
     box_inch = width_inch / cols
@@ -71,7 +72,7 @@ def plot_spectrum(
     axs[0, 0].set_xlabel("Eig 1", labelpad=2)
     sp_ylbl = axs[0, 0].set_ylabel("Eig 2", labelpad=2, va="baseline")
     axs[0, 0].set_zorder(2)
-    axs[0, 3].set_title("t-SNE ($\\rho = {}$1)")
+    axs[0, 3].set_title("t-SNE ($\\rho = 1$)")
     axs[0, 3].scatter(tsne[:, 0], tsne[:, 1], c=labels, alpha=alpha, rasterized=True)
     axs[0, 3].set_zorder(3)
     axs[1, 1].set_title("ForceAtlas2")
@@ -90,12 +91,13 @@ def plot_spectrum(
     axs[0, 4].remove()
     axs[0, 5].remove()
     # fig.set_size_inches(width_inch, rows * box_inch)
+    fig.subplots_adjust(0, 0, 1, 1)
 
     # add t-sne with exaggeration
     gs_exag = gridspec.GridSpecFromSubplotSpec(1, 3, subplot_spec=gs[0, 1:3])
     exag_axs = []
     for title, data, g in zip(
-        [r"$ρ = {}$100", r"$\rho = {}$30", r"$\rho = {}$4"],
+        [r"$\rho = 100$", r"$\rho = 30$", r"$\rho = 4$"],
         [tsne100, tsne30, tsne4],
         gs_exag,
     ):
@@ -108,7 +110,7 @@ def plot_spectrum(
     # the previous plots
     gs_half = gridspec.GridSpecFromSubplotSpec(1, 3, subplot_spec=gs[0, 4:])
     ax = fig.add_subplot(gs_half[0], zorder=5)
-    ax.set_title(r"$\rho = \mathdefault{\frac{1}{2}}$")
+    ax.set_title(r"$\rho = {\frac{1}{2}}$")
     ax.scatter(tsnehalf[:, 0], tsnehalf[:, 1], c=labels, alpha=alpha, rasterized=True)
 
     arrstyle = mpl.patches.ArrowStyle("<->", head_length=0.4, head_width=0.4)
@@ -276,8 +278,16 @@ if __name__ == "__main__":
     # (on MNIST)
     data[0] *= -1
 
-    with plt.rc_context({"font.size": 5.25}, fname=rcfile):
+    with plt.rc_context({# "text.latex.preamble":
+                         # r"\usepackage[OT1,euler-digits]{eulervm}",
+                         "font.size": 7.25}, fname=rcfile):
         fig, *_ = plot_spectrum(*data, labels=labels)
-    fig.savefig(sys.argv[3], format="pdf", bbox_inches="tight")
+    fig.savefig(sys.argv[3], format="pdf", bbox_inches="tight", pad=0)
+    fig.savefig(
+        "../../mthesis/figures/forces/ar-spectrum.pdf",
+        format="pdf",
+        bbox_inches="tight",
+        pad=0,
+    )
     # link to the result
     # os.link(plotter.outdir / relname, sys.argv[3])

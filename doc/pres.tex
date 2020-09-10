@@ -1,0 +1,187 @@
+\documentclass{beamer}
+
+\usepackage[english]{babel}
+\usepackage[noflama,nosectionpages]{beamerthemehsrm}
+% \usepackage{unicode-math}
+\usepackage{graphicx}
+\usepackage[round]{natbib}
+
+\usetheme{hsrm}
+\usepackage{media9}
+
+\title{Progress Report}
+\subtitle{t-SNE and other Neighborhood Embedding algorithms}
+\author{Jan Niklas Böhm}
+\institute{University of Tübingen}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section*{Premise}
+
+\begin{frame}{Neighborhood embeddings}
+  \begin{block}{\textbf{Definition:} Neighborhood embeddings}
+    A function $f: \mathbb R^{n\times n} \to \mathbb R^s$ that
+    visualizes a layout of $n$ points (so $s=2$ here).
+  \end{block}
+\end{frame}
+
+\begin{frame}{Premise}
+  \begin{itemize}
+  \item Compare UMAP~\citep{mcinnes2018umap} and t-SNE~\citep{maaten2008visualizing}
+  \item Compare FA2~\citep{jacomy2014forceatlas2} and t-SNE
+  \end{itemize}
+
+  \bigskip\pause They're all based on computing some sort of force equilibrium.
+\end{frame}
+
+\begin{frame}[plain]{}
+  \vfill
+  \centering\includegraphics[width=\linewidth]{../media/ar-spectrum}
+  \vfill
+\end{frame}
+
+\section*{UMAP vs. t-SNE}
+
+\begin{frame}{Gradients}
+
+  \begin{align}
+    \frac{\partial \mathcal L_{\textrm{t-SNE}}(\rho)}{\partial \mathbf y_i} &\sim \overbrace{\sum_j v_{ij}w_{ij}(\mathbf y_i-\mathbf y_j)}^{\text{attraction}} - \overbrace{\frac{n}{\rho Z}\sum_j w_{ij}^2(\mathbf y_i-\mathbf y_j)}^{\text{repulsion}} \label{eq:tsneGradientExagg}\\
+    \frac{\partial \mathcal L_{\textrm{UMAP}}(\gamma)}{\partial \mathbf y_i} &\sim \sum_j v_{ij}w_{ij}(\mathbf y_i-\mathbf y_j) - \gamma \sum_j \frac{1}{d_{ij}^2 +\epsilon}w_{ij}(\mathbf y_i-\mathbf y_j) \label{eq:umapGradientGamma}
+  \end{align}
+
+  Equations~\ref{eq:tsneGradientExagg} and~\ref{eq:umapGradientGamma}
+  are essentially equal if $\gamma={n/\rho Z}$.
+
+  \bigskip\pause Unfortunately, this factor is unknown a priori.
+\end{frame}
+
+\begin{frame}{\protect{Can we make assumptions about $n/\rho Z$?}}
+  \includegraphics[width=\linewidth]{../media/distance-correlations}
+
+  \bigskip\pause The expression $n/\rho Z$ depends on both $\rho$ and
+  $Z$ in a non-obvious fashion.  Especially $Z$---the normalization
+  constant---is difficult to predict.
+
+  \bigskip\pause (Setting $\gamma$ to the values indicated here leads
+  to unstable results.)
+\end{frame}
+
+\begin{frame}{Excursion: Noise-contrastive estimation}
+  A probablity distribution can be learned by sampling from another
+  (fixed) distribution and creating a supervised learning
+  problem~\citep{hastie2009elements}.
+
+  \bigskip\pause This also works for unnormalized distributions by
+  additionally learning the normalization
+  constant~\citep{gutmann12nce}.
+
+  This has been implemented for t-SNE~\citep{artemenkov2020ncvis}.
+\end{frame}
+
+\begin{frame}
+  Equation~\ref{eq:umapGradientGamma} was a lie.  Instead the gradient
+  uses negative sampling.
+
+  \begin{align}
+    \frac{\partial \mathcal L_{\textrm{UMAP}}(\gamma)}{\partial
+    \mathbf y_i} &\sim \sum_j v_{ij}w_{ij}(\mathbf y_i-\mathbf y_j) -
+                   \gamma \sum_{j\sim U(n)}^\nu \frac{1}{d_{ij}^2 +\epsilon}w_{ij}(\mathbf y_i-\mathbf y_j)
+  \end{align}
+\end{frame}
+
+\begin{frame}{UMAP: negative sampling}
+  Negative sampling does not account for the normalization constant
+  and instead does\dots\pause\ nothing?
+
+  \bigskip\pause In general it's hard to analyze and does not stand on
+  sound theoretical footing.
+
+  \bigskip\pause But, as the number of negative samples, $\nu$
+  increases, the bias should decrease.
+\end{frame}
+
+\begin{frame}{Letting $\nu\to n$}
+  \includegraphics[width=\linewidth]{../media/umap-repulsion}
+
+  \bigskip\pause This is very inefficient.
+\end{frame}
+
+\begin{frame}{Same experiment with Barnes–Hut}
+  \includegraphics[width=\linewidth]{../media/elastic-gammas}
+\end{frame}
+
+\begin{frame}{Small conclusion}
+  Layout created by UMAP is a result of a biased estimator for the
+  repulsive forces.
+\end{frame}
+
+\section*{FA2 vs. t-SNE}
+
+\begin{frame}{}
+  \begin{align}
+    \frac{\partial \mathcal L_{\textrm{t-SNE}}(\rho)}{\partial \mathbf y_i} &\sim \overbrace{\sum_j v_{ij}w_{ij}(\mathbf y_i-\mathbf y_j)}^{\text{attraction}} - \overbrace{\frac{n}{\rho Z}\sum_j w_{ij}^2(\mathbf y_i-\mathbf y_j)}^{\text{repulsion}} \nonumber\\
+    \frac{\partial \mathcal L_{\textrm{FA2}}}{\partial \mathbf y_i} &= \sum_j v_{ij}(\mathbf y_i-\mathbf y_j) - \sum_j \frac{(h_i+1)(h_j+1)}{d_{ij}^2}(\mathbf y_i-\mathbf y_j) \label{eq:FA2gradient}
+  \end{align}
+
+  \bigskip\pause Attractive forces don't decay.
+\end{frame}
+
+\begin{frame}{Beyond FA2 \citep{noack2009modularity}}
+  \centering\includegraphics[width=.7\linewidth]{../media/misc/mnist_noack.pdf}
+\end{frame}
+
+\begin{frame}{Small conclusion}
+  Connection still not that well established.
+\end{frame}
+
+\section*{Empirical}
+\begin{frame}{Fashion MNIST~\citep{xiao2017fashion}}
+  \includegraphics[width=\linewidth]{../media/alt/famnist}
+\end{frame}
+\begin{frame}{Kannada script~\citep{prabhu2019kannada}}
+  \includegraphics[width=\linewidth]{../media/alt/kannada}
+\end{frame}
+\begin{frame}{Kuzushiji Kanjis~\citep{clanuwat2018kuzmnist}}
+  \includegraphics[width=\linewidth]{../media/alt/kuzmnist}
+\end{frame}
+\begin{frame}{Treutlein human~\citep{kanton2019organoid}}
+  \includegraphics[width=\linewidth]{../media/treutlein-human}
+\end{frame}
+\begin{frame}{Treutlein chimp~\citep{kanton2019organoid}}
+  \includegraphics[width=\linewidth]{../media/supp/treutlein-chimp}
+\end{frame}
+\begin{frame}{Treutlein human \citep{kanton2019organoid}}
+  \includegraphics[width=\linewidth]{../media/supp/treutlein-human-highk}
+\end{frame}
+\begin{frame}{Treutlein chimp\citep{kanton2019organoid}}
+  \includegraphics[width=\linewidth]{../media/supp/treutlein-chimp-highk}
+\end{frame}
+\begin{frame}{Hydra \citep{siebert19hydra}}
+  \includegraphics[width=\linewidth]{../media/alt/hydra}
+\end{frame}
+\begin{frame}{Zebrafish \citep{wagner2018zfish}}
+  \includegraphics[width=\linewidth]{../media/alt/zfish}
+\end{frame}
+\begin{frame}{Mouse cortex \citep{tasic2018shared}}
+  \includegraphics[width=\linewidth]{../media/alt/tasic}
+\end{frame}
+
+\begin{frame}{Open quesitons}
+  \begin{itemize}
+  \item Formal analysis of negative sampling
+  \item Fractional exponents for Noack/FA2
+  \item Analytical solutions for t-SNE via Laplacian with a repulsion
+    term?
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{}
+  \tiny
+  \bibliographystyle{plainnat}
+  \bibliography{bibliography}
+\end{frame}
+
+\end{document}

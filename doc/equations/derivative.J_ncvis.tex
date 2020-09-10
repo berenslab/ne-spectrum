@@ -1,0 +1,136 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{amsmath}
+\usepackage[utf8]{luainputenc}
+
+\author{Niklas Böhm}
+\title{Derivative of $J(\theta)$}
+% p_m(x_i; \theta)
+\newcommand{\pmodel}[1]{\ensuremath p_m\left(#1; \theta\right)}
+\newcommand{\pnoise}[1]{\ensuremath p_n(#1)}
+\newcommand{\dtheta}{\ensuremath \frac{\partial}{\partial\vartheta}}
+\newcommand{\dzi}{\ensuremath \frac{\partial}{\partial z_i}}
+
+\begin{document}
+\maketitle
+
+\section*{Definition}
+
+The cost function $J(\theta)$ is defined as
+\begin{align*}
+  J(\theta) = \frac{1}{T_d} \sum_{i=1}^{T_d} \log \frac{\pmodel{x_i}}{\pmodel{x_i} + \pnoise{x_i}}
+              + \nu \sum_{i=1}^{T_n} \log \frac{\nu \cdot \pmodel{y_i}}{\pmodel{y_i} + \nu\pnoise{y_i}}
+\end{align*}
+
+\noindent This equation corresponds to $J_T(\theta)$ from Artemenkov and Panov (2020).  Taking the derivative:
+
+\begin{align*}
+  \dtheta J(\theta) &= \dtheta \left( \frac{1}{T_d} \sum_{i=1}^{T_d} \log \frac{\pmodel{x_i}}{\pmodel{x_i} + \pnoise{x_i}}
+                      + \nu \sum_{i=1}^{T_n} \log \frac{\nu \cdot \pmodel{y_i}}{\pmodel{y_i} + \nu\pnoise{y_i}} \right) \\
+                    &= \underbrace{\dtheta\frac{1}{T_d} \sum_{i=1}^{T_d} \log \frac{\pmodel{x_i}}{\pmodel{x_i} + \pnoise{x_i}}}_{(1)}
+                      + \underbrace{\dtheta\nu \sum_{i=1}^{T_n} \log \frac{\nu \cdot \pmodel{y_i}}{\pmodel{y_i} + \nu\pnoise{y_i}}}_{(2)}
+\end{align*}
+
+\noindent We derive wrt $\vartheta$ to make it clear that the
+normalization constant $Q\in\theta$ as well as
+$\{z_i\}_{i=1}^{N}\subset\theta$. As such, $\dtheta \pmodel{\,\cdot\,}$
+has to make a distinction between those two cases, but this does not
+have too big of an impact in the derivation itself.
+
+\goodbreak
+Using the chain rule and pulling the logarithm apart, we can recover the following for (1):
+
+\begin{align*}
+  (1) &= \sum_{i=1}^{T_d} \dtheta\pmodel{x_i} \left(  \frac{1}{\pmodel{x_i}} - \frac{1}{\pmodel{x_i} + \pnoise{x_i}}\right)
+\end{align*}
+
+Likewise for (2).  To keep the structure similar to (1), the gradients will only be partially expanded.
+
+\begin{align*}
+  (2) &= \nu \sum_{i=1}^{T_n} \dtheta\pmodel{y_i} \left(  \frac{1}{\pmodel{y_i}} - \frac{1}{\pmodel{y_i} + \pnoise{y_i}}\right)
+\end{align*}
+
+The expression $\dtheta \pmodel{x}$ makes a distinction between
+$\vartheta = Q$ and all the other parameters. See how (1.1) is
+expanded for an idea on how the gradient will look in this case.
+
+Plugging the expressions back into the main derivative gives
+
+\begin{align*}
+  \dtheta J(\theta) = &\sum_{i=1}^{T_d} \dtheta\pmodel{x_i} \left(  \frac{1}{\pmodel{x_i}} - \frac{1}{\pmodel{x_i} + \pnoise{x_i}}\right) \\
+                      &+ \nu \sum_{i=1}^{T_n} \dtheta\pmodel{y_i} \left(  \frac{1}{\pmodel{y_i}} - \frac{1}{\pmodel{y_i} + \pnoise{y_i}}\right)
+\end{align*}
+
+We can substitute $\pmodel{,\cdot\,}$ with $q_{x_i} = q_{ij}$, resulting in
+
+\begin{align*}
+  \dtheta J(\theta) = &\sum_{(i,j)\in X} \dtheta q_{ij} \left(  \frac{1}{q_{ij}} - \frac{1}{q_{ij} + \pnoise{i, j}}\right) \\
+                      &+ \nu \sum_{(i,j')\in Y} \dtheta q_{ij'} \left(  \frac{1}{q_{ij'}} - \frac{1}{q_{ij'} + \pnoise{i,j'}}\right)\,.
+\end{align*}
+
+
+
+\section*{In detail}
+
+\subsection*{“Attraction”}
+Starting with the first part
+\begin{align*}
+  (1) &= \dtheta\frac{1}{T_d} \sum_{i=1}^{T_d} \log \frac{\pmodel{x_i}}{\pmodel{x_i} + \pnoise{x_i}} \\
+      &= \dtheta\frac{1}{T_d} \sum_{i=1}^{T_d} \log {\pmodel{x_i}} - \log \left(\pmodel{x_i} + \pnoise{x_i}\right) \\
+      &= \frac{1}{T_d} \sum_{i=1}^{T_d} \dtheta\Big(  \log {\pmodel{x_i}} - \log \big(\pmodel{x_i} + \pnoise{x_i}\big)\Big) \\
+      &= \frac{1}{T_d} \sum_{i=1}^{T_d} \underbrace{\dtheta \log {\pmodel{x_i}}}_{(1.1)} - \underbrace{\dtheta\log \big(\pmodel{x_i} + \pnoise{x_i}\big)}_{(1.2)} \\
+\end{align*}
+
+\noindent Now both parts can be treated separately.  Starting with $(1.1)$:
+\begin{align*}
+  (1.1) &= \dtheta \log {\pmodel{x_i}} \\
+  \intertext{$x_i$ corresponds to an edge pair $(i,j)$.}
+        &= \dtheta \log {\pmodel{i, j}} \\
+  \intertext{The model is referring to $q_{ij}$.}
+        &= \dtheta \log {q_{ij}} \\
+  \intertext{Taking the definition of $q_{ij}$ in the NCE setting gives}
+        &= \dtheta \log \left\{\hat q_{ij} \cdot e^{-Q}\right\} \\
+        &= \dtheta \log \left\{(1 + ||z_i - z_j||^2)^{-1} \cdot e^{-Q}\right\} \\
+        &= \dtheta \log \left\{(1 + ||z_i - z_j||^2)^{-1} \right\} + \dtheta \log e^{-Q} \\
+  \intertext{Now we have to distinguish between $Q\in \theta$ and $z_i\in
+  \theta$. The former works out to $\partial \log e^{-Q} / \partial Q =
+  -1$.  In all other cases, this part will equal zero and thus vanish.  To indicate this, we now derive wrt $z_i$.}
+        &= \dzi  \log \left\{(1 + ||z_i - z_j||^2)^{-1} \right\} \\
+        &= \dzi  -\log \left\{(1 + ||z_i - z_j||^2) \right\} \\
+  \intertext{Using the chain rule gives}
+        &= -1 \bigg/\bigg(1+||z_i - z_j||^2 \bigg) \cdot \dzi \Big(1 + ||z_i - z_j||^2\Big) \\
+        &= -1 \bigg/\bigg(1+||z_i - z_j||^2 \bigg) \cdot 2\cdot||z_i - z_j|| \\
+  \dzi \log {\pmodel{x_i}} &= - \frac{2\,||z_i - z_j||}{1+||z_i - z_j||^2}\,.
+\end{align*}
+
+\bigskip
+\noindent Now we return to $(1.2)$:
+\begin{align*}
+  (1.2) &= \dtheta\log \big(\pmodel{x_i} + \pnoise{x_i}\big) \\
+        &= \frac{1}{\pmodel{x_i} + \pnoise{x_i}} \cdot \dtheta \big(\pmodel{x_i} + \pnoise{x_i}\big) \\
+  \intertext{Since $\pnoise{x_i}$ is independent of $\theta$ it vanishes, resulting in}
+        &= \frac{1}{\pmodel{x_i} + \pnoise{x_i}} \cdot \dtheta \pmodel{x_i}\,.
+\end{align*}
+
+\noindent We will leave the expression as is and turn to $(2)$.
+
+\subsection*{“Repulsion”}
+Starting with the equation itself, we can resolve the equation similarly to $(1)$.
+
+\begin{align*}
+  (2) &= \dtheta\nu \sum_{i=1}^{T_n} \log \frac{\nu \cdot \pmodel{y_i}}{\pmodel{y_i} + \nu\pnoise{y_i}} \\
+      &= \nu \sum_{i=1}^{T_n} \underbrace{\dtheta\log \big({\nu \cdot \pmodel{y_i}}\big)}_{(2.1)}
+        - \underbrace{\dtheta\log\big(  {\pmodel{y_i} + \nu\pnoise{y_i}}\big)}_{(2.2)} \\
+  \intertext{The parts $(2.1)$ and $(2.2)$ behave similarly to the parts in Equation $(1)$.}
+      &= \nu \sum_{i=1}^{T_n} \frac{1}{\pmodel{y_i}}\dtheta\pmodel{y_i} - \frac{1}{\pmodel{y_i} + \pnoise{y_i}}\dtheta\pmodel{y_i}\\
+      &= \nu \sum_{i=1}^{T_n} \dtheta\pmodel{y_i} \left(  \frac{1}{\pmodel{y_i}} - \frac{1}{\pmodel{y_i} + \pnoise{y_i}}\right)\,.
+\end{align*}
+
+\subsection*{Putting it back together}
+Substituting everyhting back into the original equation then gives
+\begin{align*}
+  \dtheta J(\theta) =\; &\dtheta\frac{1}{T_d} \sum_{i=1}^{T_d} \log {\pmodel{x_i}} - \log\big({\pmodel{x_i} + \pnoise{x_i}}\big)\\
+                        &+ \dtheta\nu \sum_{i=1}^{T_n} \log \big({\nu \cdot \pmodel{y_i}}\big) - \log\big({\pmodel{y_i} + \nu\pnoise{y_i}}\big) \\
+  =\; &\frac{1}{T_d} \sum_{i=1}^{T_d} \frac{-2\,||z_i - z_j||}{1+||z_i - z_j||^2} - \frac{1}{\pmodel{x_i} + \pnoise{x_i}} \cdot \dtheta \pmodel{x_i}\\
+                        &+ \nu \sum_{i=1}^{T_n} \dtheta\pmodel{y_i} \left(  \frac{1}{\pmodel{y_i}} - \frac{1}{\pmodel{y_i} + \pnoise{y_i}}\right)
+\end{align*}
+\end{document}

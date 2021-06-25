@@ -1,3 +1,4 @@
+from pathlib import Path
 from sklearn.datasets import fetch_openml
 import numpy as np
 
@@ -10,7 +11,9 @@ class MNIST(GenStage):
     The data source is the MNIST handwritten digit dataset."""
 
     def load(self):
-        self.mnist = fetch_openml("mnist_784")
+        cachedir = Path().home() / ".cache/scikit_learn_data"
+        path = str(cachedir) if cachedir.exists() else None
+        self.mnist = fetch_openml("mnist_784", data_home=path)
 
     def transform(self):
         self.data_ = self.mnist.data

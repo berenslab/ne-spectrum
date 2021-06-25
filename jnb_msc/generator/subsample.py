@@ -1,4 +1,3 @@
-from sklearn.datasets import fetch_openml
 import numpy as np
 
 from . import GenStage

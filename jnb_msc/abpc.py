@@ -1,5 +1,6 @@
 import abc
 import os
+import shutil
 
 import numpy as np
 
@@ -102,7 +103,7 @@ class ProjectBase(abc.ABC):
 
             tmpname = "{}.{}".format(f.name, Path(fname).name)
             os.link(f.name, tmpname)
-        os.replace(tmpname, fname)
+        shutil.move(tmpname, fname)
 
     @staticmethod
     def find_upwards(path, name):

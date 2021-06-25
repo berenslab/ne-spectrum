@@ -7,6 +7,7 @@ import numpy
 bh_umap = Extension(
     name="bhumap",
     sources=["jnb_msc/transformer/bhumap.pyx"],
+    language="c++",
     library_dirs=["jnb_msc"],
     ## This needs to be adapted for the respective location
     include_dirs=["../../../msc/vendor/python/openTSNE/", numpy.get_include()],
@@ -15,6 +16,7 @@ bh_umap = Extension(
 bh_noack = Extension(
     name="bhnoack",
     sources=["jnb_msc/transformer/bhnoack.pyx"],
+    language="c++",
     library_dirs=["jnb_msc"],
     ## This needs to be adapted for the respective location
     include_dirs=["../../../msc/vendor/python/openTSNE/", numpy.get_include()],

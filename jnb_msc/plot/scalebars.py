@@ -61,7 +61,7 @@ class AnchoredScaleBar(AnchoredOffsetbox):
             )
 
         if sizex and labelx:
-            self.xlabel = TextArea(labelx, minimumdescent=False)
+            self.xlabel = TextArea(labelx)
             bars = VPacker(children=[bars, self.xlabel], align="center", pad=0, sep=sep)
         if sizey and labely:
             self.ylabel = TextArea(labely)

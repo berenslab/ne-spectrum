@@ -13,7 +13,7 @@ from pathlib import Path
 
 if __name__ == "__main__":
     dsrc = Path("../data/mnist/subsample;n:6000/pca")
-    umap_init = dsrc / f"umap_knn/maxscale;f:10/umap"
+    umap_prefix = dsrc / f"umap_knn/maxscale;f:10"
 
     nus = [5, 500, 2000]
     n_epochs = 3000

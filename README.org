@@ -2,12 +2,38 @@ This repository holds the code for https://arxiv.org/abs/2007.08902: A Unifying 
 
 
 * Structure/Installation
-The code all lives in =jnb_msc= and can be installed via
+
+After all instructions in this section have been completed, the code can be installed via
 
 #+begin_src sh
 git clone https://github.com/berenslab/ne-spectrum
 cd ne-spectrum
-pip install -e .
+pip install --user -r requirements.txt
+python setup.py build
+mv bh*.so jnb_msc/transformer/
+pip install --user -e .
+#+end_src
+
+The above command will probably fail to compile the cython extensions.
+For that you need to install/compile [[https://github.com/pavlin-policar/openTSNE][openTSNE]] manually (clone the repo
+and install it similarly as above).  This project has a build time
+dependency on a build time artifact (the file =quad_tree.pxd=) that is
+not installed along openTSNE by default.
+
+After installing openTSNE this way you have to adapt the two lines in
+=setup.py= that point to the locally installed openTSNE folder, so
+that during the build process the missing file can be found.
+
+Furthermore, you need a patched version of forceatlas2 from
+[[https://github.com/jnboehm/forceatlas2]], where degree repulsion has
+been added to fa2.  Install it as follows
+
+#+begin_src sh
+git clone https://github.com/jnboehm/forceatlas2
+cd forceatlas2
+rm fa2/fa2util.c
+python setup.py build
+pip install --user -e .
 #+end_src
 
 There is also a =requirements.txt= file to install the dependencies.

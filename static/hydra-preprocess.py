@@ -9,6 +9,11 @@
 # have the prefix argument point to the folder that contains it.  Note
 # that this script operates directly on the gzipped files.
 
+# hydra metadata is from
+# https://storage.googleapis.com/fc-472a9b22-240f-4a97-9567-835a1c3d2b41/metadata.txt
+# accessed via
+# https://singlecell.broadinstitute.org/single_cell/study/SCP260/stem-cell-differentiation-trajectories-in-hydra-resolved-at-single-cell-resolution?cluster=Whole%20Transcriptome%20Clustering&spatialGroups=--&annotation=Cluster--group--study&subsample=all#study-download
+# which requires a login (with Google)
 import numpy as np
 import pandas as pd
 import gzip
@@ -93,7 +98,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     p = args.prefix.expanduser()
-    metafile = opath / "metadata-hydra.csv"
+    metafile = opath / "hydra-metadata.csv"
     X, stage = preprocess(p / transcriptome_count, metafile)
 
     outputfile = "hydra"

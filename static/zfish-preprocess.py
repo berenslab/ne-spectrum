@@ -6,7 +6,7 @@
 # https://kleintools.hms.harvard.edu/paper_websites/wagner_zebrafish_timecourse2018/mainpage.html
 # and have the prefix point at the containing folder.
 
-# Direct file download
+# Direct file download, contains everything for the dataset
 # https://kleintools.hms.harvard.edu/paper_websites/wagner_zebrafish_timecourse2018/WagnerScience2018.h5ad
 
 import numpy as np
@@ -97,7 +97,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     p = args.prefix.expanduser()
-    metafile = opath / "metadata-hydra.csv"
     X, stage, alt_c = preprocess(p / annfile)
 
     outputfile = "zfish"

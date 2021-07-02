@@ -1,3 +1,4 @@
+from pathlib import Path
 from sklearn.datasets import fetch_openml
 import numpy as np
 
@@ -11,7 +12,9 @@ class FashionMNIST(MNIST):
     https://github.com/zalandoresearch/fashion-mnist."""
 
     def load(self):
-        self.mnist = fetch_openml("Fashion-MNIST")
+        cachedir = Path().home() / ".cache/scikit_learn_data"
+        path = str(cachedir) if cachedir.exists() else None
+        self.mnist = fetch_openml("Fashion-MNIST", data_home=path)
         self.description_ = (
             f"The Fashion MNIST dataset, consisting of {self.mnist.data.shape[0]} "
             f"datapoints with {self.mnist.data.shape[1]} dimensions each."
@@ -28,7 +31,9 @@ class KuzushijiMNIST(FashionMNIST):
     """MNIST-like dataset consisting of Kanjis."""
 
     def load(self):
-        self.mnist = fetch_openml("Kuzushiji-MNIST")
+        cachedir = Path().home() / ".cache/scikit_learn_data"
+        path = str(cachedir) if cachedir.exists() else None
+        self.mnist = fetch_openml("Kuzushiji-MNIST", data_home=path)
         self.description_ = (
             f"The Kuzushiji MNIST dataset, consisting of {self.mnist.data.shape[0]} "
             f"datapoints with {self.mnist.data.shape[1]} dimensions each."

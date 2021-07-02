@@ -61,6 +61,7 @@ def name_class_dict():
         "ann": j.ANN,
         "aann": j.AsymmetricANN,
         "knn_aff": j.KNNAffinities,
+        "exact_nn": j.ExactNeighbors,
         "affinity": j.PerplexityAffinity,
         "random": j.RandomGauss,
         "rnd_prj": j.RandomProjection,

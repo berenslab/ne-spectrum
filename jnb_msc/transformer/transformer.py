@@ -25,12 +25,11 @@ class TransformerStage(ProjectBase):
         self.n_components = n_components
 
     def get_datadeps(self):
-        return [self.indir / self.dataname, self.indir / self.descname]
+        return [self.indir / self.dataname]
 
     def load(self):
         self.data = np.load(self.get_datadeps()[0])
-        # unused as of now
-        self.description = Path(self.get_datadeps()[1]).read_text()
+
 
 
 class NDStage(TransformerStage):

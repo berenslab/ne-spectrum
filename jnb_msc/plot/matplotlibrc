@@ -34,7 +34,6 @@ legend.fancybox : False
 
 axes.unicode_minus : True
 text.usetex: False
-text.latex.unicode : False
 # text.latex.preamble : "\\usepackage{amsmath}"
 
 mathtext.it : sans:italic

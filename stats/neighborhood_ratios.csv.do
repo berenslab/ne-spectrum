@@ -41,8 +41,18 @@ def neighbor_preservation(hi_knn, lo_knn, samples=[]):
 
 
 if __name__ == "__main__":
-    ds_names = ["mnist", "treutlein", "treutlein_409b2", "famnist", "kuzmnist"]
-    dsrcs = {dname: Path("../data") / dname / "pca" for dname in ds_names}
+    ds_names = [
+        "mnist/pca",
+        "famnist/pca",
+        "kannada/pca",
+        "kuzmnist/pca",
+        "treutlein",
+        "treutlein_409b2",
+        "hydra",
+        "tasic",
+        "zfish",
+    ]
+    dsrcs = {dname: Path("../data") / dname for dname in ds_names}
     rng = np.random.RandomState(12103)
 
     rhos = lib.get_rhos()
@@ -52,6 +62,7 @@ if __name__ == "__main__":
     # recreate all files in one go
     datadeps = []
     for dname, dsrc in dsrcs.items():
+
         tsnes = [lib.tsne_from_rho(rho, dsrc) for rho in rhos]
         datadeps += [tsne_path.parent / "exact_nn/nns.mtx" for tsne_path in tsnes]
     lib.redo.redo_ifchange(datadeps)

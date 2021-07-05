@@ -23,10 +23,14 @@ from matplotlib.legend_handler import HandlerTuple
 
 def plot_mnn(ax, df):
     ax.plot(df.index, df["mnist"],           label="MNIST")
-    ax.plot(df.index, df["treutlein"],       label="Chimp organoid")
-    ax.plot(df.index, df["treutlein_409b2"], label="Human organoid")
     ax.plot(df.index, df["famnist"],         label="Fashion MNIST")
     ax.plot(df.index, df["kuzmnist"],        label="Kuzushiji MNIST")
+    ax.plot(df.index, df["kannada"],         label="Kannnada MNIST")
+    ax.plot(df.index, df["treutlein"],       label="Chimp organoid")
+    ax.plot(df.index, df["treutlein_409b2"], label="Human organoid")
+    ax.plot(df.index, df["tasic"],           label="Mouse cortex")
+    ax.plot(df.index, df["hydra"],           label="Hydra polyp")
+    ax.plot(df.index, df["zfish"],           label="Zebrafish")
 
     ax.set_xscale("log")
     ax.set_xlabel(r"$\rho$")
@@ -42,7 +46,7 @@ def plot_mnn(ax, df):
 if __name__ == "__main__":
 
     mnn_fpath = "../stats/neighborhood_ratios.csv"
-    # redo.redo_ifchange(mnn_fpath)
+    redo.redo_ifchange(mnn_fpath)
     # abuse the plotter object to get the rc
     plotter = jnb_msc.plot.ScatterMultiple("../data/mnist/")
     rcfile = plotter.rc

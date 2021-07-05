@@ -53,5 +53,5 @@ class KannadaMNIST(MNIST):
         self.description_ = "The Kannada MNIST dataset."
 
     def transform(self):
-        self.data_ = self.data
+        self.data_ = self.data.reshape(70000, 28 * 28)
         self.labels_ = self.labels.astype(np.int8)

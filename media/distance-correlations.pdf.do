@@ -292,11 +292,4 @@ if __name__ == "__main__":
             # trans = ax.yaxis.get_label().get_transform()
             # ax.text(0, 1, ltr, fontdict=fd, transform=trans)
 
-    # really bad and non-portable way to get a pdf that has minus
-    # signs!!!
-    alt_out = Path(sys.argv[2])
-    alt_out = alt_out.with_name(alt_out.stem + ".svg")
-    fig.savefig(alt_out, format="svg", bbox_inches="tight")
-    subprocess.call(["rsvg-convert", "-f", "pdf", "-o", sys.argv[3], alt_out])
-    # fig.savefig(sys.argv[3], format="pdf", bbox_inches="tight")
-    fig.savefig(sys.argv[2] + ".png", format="png", bbox_inches="tight")
+    fig.savefig(sys.argv[3], format="pdf", bbox_inches="tight")

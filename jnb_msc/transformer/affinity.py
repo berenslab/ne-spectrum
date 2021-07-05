@@ -27,6 +27,6 @@ class PerplexityAffinity(NNStage):
             perplexity=self.perplexity,
             metric=self.metric,
             n_jobs=self.n_jobs,
-            random_state=self.random_state,
+            random_state=self.random_state.randint(-2 ** 31, 2 ** 31),
         ).P  # extract just the matrix
         return self.data_

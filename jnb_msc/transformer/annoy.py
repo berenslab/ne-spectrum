@@ -88,7 +88,7 @@ class ANN(NNStage):
 class AsymmetricANN(ANN):
     def transform(self):
         seed = self.random_state.randint(-(2 ** 31), 2 ** 31)
-        self.data_, (self.knn_indices_, self.knn_dists_), self.annoy_idx = make_adj_mat(
+        self.data_, self.annoy_idx = make_adj_mat(
             self.data,
             n_neighbors=self.n_neighbors,
             metric=self.metric,

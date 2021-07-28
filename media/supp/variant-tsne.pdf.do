@@ -5,7 +5,6 @@ import os
 import sys
 import inspect
 
-from umap.umap_ import find_ab_params
 import numpy as np
 
 from pathlib import Path
@@ -14,52 +13,31 @@ from pathlib import Path
 if __name__ == "__main__":
     dsrc = Path("../../data/mnist/pca")
     knn_prefix = "ann/spnorm"
+    # use "aann/spnorm/spsym" to have an easier textual description
 
     tsne_default = dsrc / "affinity/stdscale;f:1e-4/tsne"
     tsne_knn = dsrc / knn_prefix / "stdscale;f:1e-4/tsne"
 
-    min_dist = 0.1
-    spread = 1.0
-    a, b = find_ab_params(spread, min_dist)
-
-    umap = dsrc / "umap_knn/maxscale;f:10/umap"
-    umap_default = dsrc / f"umap_knn/spectral/maxscale;f:10/umap;a:{a};b:{b}"
-    umap_knn = dsrc / knn_prefix / "maxscale;f:10/umap"
-    umap_knn_eps = dsrc / knn_prefix / "maxscale;f:10/umap;eps:1"
-    fa2 = dsrc / "ann/fa2;use_degrees:0"
-    fa2_degrep = dsrc / "ann/fa2"
-
     dpaths = [
         tsne_default,
         tsne_knn,
-        fa2_degrep,
-        fa2,
-        umap_default,
-        umap,
-        umap_knn,
-        umap_knn_eps,
     ]
     titles = [
         "Default t-SNE\n",
         "t-SNE,\nkNN affin. ($k={}$15)",
-        "FA2,\nRepulsion by degree",
-        "FA2,\nFixed repulsion",
-        "Default UMAP\n",
-        "UMAP, $\mathit{a}=b=\mathdefault{1}$\n",
-        "UMAP,\n$a=b=\mathdefault{1}$, kNN affin.",
-        "UMAP,\n$a=b=\mathdefault{1}$, kNN affin., $\epsilon=\mathdefault{1}$",
     ]
 
     # passing a relative plotname will ensure that the plot will also
     # be saved in the data dir.
     relname = sys.argv[2]
-    plotter = jnb_msc.plot.ScatterMultiple(
+    plotter = jnb_msc.plot.PlotRow(
         dpaths,
         plotname=relname,
         titles=titles,
         format="pdf",
         scalebars=0.25,
-        figheight=3,
+        figheight=1.5,
+        figwidth=2.25,
     )
     filedeps = set(
         [
@@ -73,8 +51,6 @@ if __name__ == "__main__":
 
     jnb_msc.redo.redo_ifchange(list(filedeps) + datadeps)
     plotter.load()
-    # flip the default UMAP with LE init
-    plotter.data[4][:, 1] *= -1
     fig, axs = plotter.transform()
     #
 
@@ -83,7 +59,4 @@ if __name__ == "__main__":
     #     ax = fig.add_subplot(gs[1, :])
     #     ax.set_title("UMAP\n")
     #     ax.set_axis_off()
-    plotter.save()
-
-    # link to the result
-    os.link(plotter.outdir / relname, sys.argv[3])
+    fig.savefig(sys.argv[3], format="pdf")

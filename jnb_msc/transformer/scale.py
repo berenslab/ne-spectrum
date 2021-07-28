@@ -48,7 +48,7 @@ class MaxScale(AbstractScale):
         outname=None,
         random_state=None,
         f=1,
-        negative_range=False,
+        negative_range=True,
     ):
         super().__init__(
             path,

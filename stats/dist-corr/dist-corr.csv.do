@@ -32,10 +32,11 @@ if __name__ == "__main__":
 
     rhos = util.get_rhos()
 
-    ix = pd.MultiIndex.from_product([["fa2", "umap"], rhos], names=["algo", "rho"])
+    df1 = pd.read_csv(csvs[0], index_col=["algo", "rho"])
+    ix = df1.index
     df = pd.DataFrame(index=ix)
     for dataset, csv in zip(datasets, csvs):
-        df1 = pd.read_csv(csv, index_col=["algo", "rho"])
+        df1 = pd.read_csv(csv, index_col=ix.names)
         df[dataset] = df1["corr"]
 
 

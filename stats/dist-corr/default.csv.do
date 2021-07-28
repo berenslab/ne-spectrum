@@ -24,10 +24,19 @@ if __name__ == "__main__":
     util.redo.redo_ifchange([util.__file__])
     rhos = util.get_rhos()
 
-    ix = pd.MultiIndex.from_product([["fa2", "umap"], rhos], names=["algo", "rho"])
 
-    # computation
-    c_fa2, c_umap = util.correlate_dataset(dsrc, rhos, random_state=rng)
+    # computation, will also call out to redo
+    corrs = util.correlate_dataset(dsrc, rhos, random_state=rng)
 
-    df = pd.DataFrame({"corr": np.hstack([c_fa2, c_umap])}, index=ix)
+    ix = pd.MultiIndex.from_product([corrs.keys(), rhos], names=["algo", "rho"])
+    df = pd.DataFrame(index=ix)
+
+    for key, c in corrs.items():
+        df.loc[key, "corr"] = c
+
+    if df.isna().any().bool():
+        from warnings import warn
+
+        warn("Resulting df has NaN values, please check!")
+
     df.to_csv(sys.argv[3])

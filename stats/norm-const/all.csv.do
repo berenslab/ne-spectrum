@@ -31,12 +31,14 @@ if __name__ == "__main__":
     util.redo.redo_ifchange([util.__file__] + csvs)
 
     rhos = util.get_rhos()
-    df1 = pd.read_csv(csvs[0], index_col=["algo", "rho"])
+
+    df1 = pd.read_csv(csvs[0], index_col="rho")
     ix = df1.index
     df = pd.DataFrame(index=ix)
     for dataset, csv in zip(datasets, csvs):
-        df1 = pd.read_csv(csv, index_col=df.index.names)
-        df[dataset] = df1["mutual-neigh-frac"]
+        df1 = pd.read_csv(csv, index_col=ix.names)
+        df[dataset] = df1["n/rho*Z"]
+        df[dataset + " Z/n"] = df1["Z/n"]
 
 
     df.to_csv(sys.argv[3])

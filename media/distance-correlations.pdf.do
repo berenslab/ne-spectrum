@@ -164,7 +164,7 @@ def plot_correlation_subsample(df, fig=None, ax=None, color="xkcd:dark grey"):
     # ax.set_xticklabels([f"{n/1000:g}k" for n in dfm["n"].values[xix]])
     ax.set_yticks([10 ** -i for i in range(1, 5)])
 
-    ax.set_aspect("equal")
+    # ax.set_aspect("equal")
     jnb_msc.plot.despine(ax)
     # legend = ax.legend(loc="best", fontsize="xx-small")
     # legend.get_frame().set_linewidth(0.4)
@@ -187,7 +187,7 @@ def plot_z(df, fig=None, ax=None, color="xkcd:dark grey"):
     ax.set_ylim(10 ** -7, 10 ** -2)
     ax.set_xticks([10 ** i for i in range(3)])
     ax.set_yticks([10 ** -i for i in range(2, 8)])
-    ax.set_aspect("equal")
+    # ax.set_aspect("equal")
 
     ax.spines["right"].set_visible(False)
     ax.spines["top"].set_visible(False)
@@ -229,7 +229,7 @@ def plot_corr_heatmap(
     ax.set_yticklabels([f"{rho:g}" for rho in df.index[yix]])
 
     cbar = fig.colorbar(
-        mat, cax=cax, ax=ax, orientation="vertical", aspect=100, shrink=0.75
+        mat, cax=cax, ax=ax, orientation="vertical", aspect=20, shrink=0.75
     )
     cbar.set_label("Dist. corr.", labelpad=-4)
     return fig, ax
@@ -239,57 +239,76 @@ if __name__ == "__main__":
 
     dsrc_chimp = Path("../data/treutlein")
 
-    dsrcs = [
-        "../stats/mnist_corr.csv",
-        "../stats/thuman_corr.csv",
-        "../stats/tchimp_corr.csv",
-    ]
+    # dsrcs = [
+    #     "../stats/mnist_corr.csv",
+    #     "../stats/thuman_corr.csv",
+    #     "../stats/tchimp_corr.csv",
+    # ]
     zstats = "../stats/z_stats.csv"
     heatmap_df = "../stats/umap-subsample-dcor.csv"
     subsample_df = "../stats/z_subsamples.csv"
-    redo.redo_ifchange(dsrcs + [heatmap_df, zstats, subsample_df])
+    redo.redo_ifchange([heatmap_df, zstats, subsample_df])
     # abuse the plotter object to get the rc
     plotter = jnb_msc.plot.ScatterMultiple(dsrc_chimp / "phony path")
     rcfile = plotter.rc
 
-    dfs = [pd.read_csv(ds) for ds in dsrcs]
-    rhos = dfs[0]["rho"]
-    corrs = [df[["fa2", "umap"]].values for df in dfs]
+    # dfs = [pd.read_csv(ds) for ds in dsrcs]
+    # rhos = dfs[0]["rho"]
+    # corrs = [df[["fa2", "umap"]].values for df in dfs]
 
     df_heatmap = pd.read_csv(heatmap_df, index_col="n")
     df_zstats = pd.read_csv(zstats)
     df_subsample = pd.read_csv(subsample_df)
 
     with plt.rc_context(fname=rcfile):
+        fig = plt.figure(
+            figsize=(5.5, 1.25),
+            constrained_layout=True,
+        )
+        # gs = fig.add_gridspec(1, 3, )
+        # figs = fig.subfigures(ncols=3, wspace=0, hspace=0, width_ratios=[1, 2, 1])
+        # axs = [f.add_subplot() for i, f in enumerate(figs)]
         fig, axs = plt.subplots(
             1,
-            4,
+            3,
             figsize=(5.5, 1.25),
-            gridspec_kw={"width_ratios": [2, 0.66, 1, 1], "wspace": 0.1},
+            gridspec_kw={"width_ratios": [1, 2, 1]},
             constrained_layout=True,
         )
         gs = axs[2].get_gridspec()
         # axs[2].remove()
         # hm_gs = gs[2].subgridspec(1, 2, width_ratios=[1, 0.075], wspace=0.05)
         # hm_ax = fig.add_subplot(hm_gs[0]), fig.add_subplot(hm_gs[1])
-        hm_ax = axs[2]
-        plot_correlation(
-            rhos,
-            corrs,
-            fig=fig,
-            ax=axs[0],
-            dsrc_names=["MNIST", "Human organoid", "Chimp organoid"],
-        )
-        plot_z(df_zstats, fig=fig, ax=axs[1])
+        hm_ax = axs[1]
+        # plot_correlation(
+        #     rhos,
+        #     corrs,
+        #     fig=fig,
+        #     ax=axs[0],
+        #     dsrc_names=["MNIST", "Human organoid", "Chimp organoid"],
+        # )
+        plot_z(df_zstats, fig=fig, ax=axs[0])
         plot_corr_heatmap(df_heatmap, fig=fig, ax=hm_ax)
-        plot_correlation_subsample(df_subsample, fig=fig, ax=axs[3])
+        plot_correlation_subsample(df_subsample, fig=fig, ax=axs[2])
 
         fd = jnb_msc.plot.ScatterMultiple.get_letterdict()
-        fd["ha"] = "right"
-        pad = plt.rcParams["axes.titlepad"]
-        for ax, ltr in zip([axs[0], axs[1], hm_ax, axs[3]], "abcd"):
-            ax.set_title(ltr + "    ", fontdict=fd, loc="left", pad=pad)
-            # trans = ax.yaxis.get_label().get_transform()
-            # ax.text(0, 1, ltr, fontdict=fd, transform=trans)
+        # for f, ltr in zip(figs, "abc"):
+        #     f.text(0, 1, ltr, fontdict=fd, transform=f.transSubfigure)
+
+        axs[0].set_title("a" + 28 * " ", fontdict=fd, loc="right")
+        axs[1].set_title("b" + 47 * " ", fontdict=fd, loc="right")
+        axs[2].set_title("c" + 28 * " ", fontdict=fd, loc="right")
+        axs[0].set_title("Full MNIST")
+        axs[1].set_title("Subsets of MNIST")
+        axs[2].set_title("Subsets of MNIST")
+        # titles = [t1, t2, t3]
+        # for ax, ltr, title in zip([axs[0], hm_ax, axs[2]], "abcd", titles):
+        #     ylab = ax.yaxis.get_label()
+        #     x, _ = ylab.get_position()
+        #     _, y = title.get_position()
+        #     ax.text(x, y, ltr, fontdict=fd)
+        #     # ax.set_title(ltr + "      ", fontdict=fd, loc="left")
+        #     # trans = ax.yaxis.get_label().get_transform()
+        #     # ax.text(0, 1, ltr, fontdict=fd, transform=trans)
 
     fig.savefig(sys.argv[3], format="pdf", bbox_inches="tight")

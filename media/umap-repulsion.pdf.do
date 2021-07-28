@@ -6,7 +6,6 @@ import sys
 import string
 import inspect
 
-# from umap import UMAP
 import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
@@ -20,33 +19,23 @@ if __name__ == "__main__":
     n_epochs = 3000
 
     umap_runs = [umap_prefix / f"umap;n_iter:{n_epochs}"]
-    umap_titles = [r"UMAP, $\nu={}$5"]
+    umap_titles = [r"UMAP, $m={}$5"]
     for nu in nus[1:]:
-        # use "early exag" with umap_prefix / "umap" / f"umap;..."
-        # and add ", EE" to the title
         umap_runs.append(umap_prefix / "umap" /
                          f"umap;n_iter:{n_epochs};nu:{nu}")
-        umap_titles.append(f"UMAP,\n$\\nu={{}}${nu}, EE")
+        umap_titles.append(f"UMAP,\n$m={{}}${nu}, EE")
 
     umap_runs2 = []
     umap_titles2 = []
     for nu in nus[1:]:
         gamma = 5 / nu
         umap_runs2.append(umap_prefix / f"umap;n_iter:{n_epochs};nu:{nu};gamma:{gamma}")
-        umap_titles2.append(f"UMAP,\n$\\nu={{}}${nu}, $\\gamma={{}}${gamma}")
+        umap_titles2.append(f"UMAP,\n$m={{}}${nu},\n$\\gamma={{}}${gamma}")
 
     tsne_runs = [
         dsrc / "affinity/stdscale;f:1e-4/tsne",
         dsrc / "affinity/stdscale;f:1e-4/tsne;late_exaggeration:2",
     ]
-
-    # phony = tsne_runs[0]      # doesn't matter what this is
-    # titles = ["t-SNE, $\\rho=$2"] + umap_titles + ["t-SNE"] \
-    #     + ["remove", "remove", umap_titles2[0], umap_titles2[1], "remove"]
-    # datafiles = tsne_runs[1:] + umap_runs + tsne_runs[:1] \
-    #     + [phony, phony, umap_runs2[0], umap_runs2[1], phony]
-    letters = "abcde" + "xxfgx"
-
     relname = sys.argv[2]
 
     datafiles = tsne_runs[1:] + umap_runs + umap_runs2 + tsne_runs[:1]
@@ -56,12 +45,7 @@ if __name__ == "__main__":
         datafiles,
         plotname=relname,
         titles=titles,
-        lettering=letters,
         layout=(2,5),
-        format="pdf",
-        scalebars=0.3,
-        alpha=1,
-        figheight=1.25,
     )
     filedeps = set(
         [
@@ -75,13 +59,11 @@ if __name__ == "__main__":
 
     jnb_msc.redo.redo_ifchange(list(filedeps) + datadeps)
     plotter.load()
-    # fig, axs = plotter.transform()
-    # axs[1,0].remove()
-    # axs[1,1].remove()
-    # axs[1,4].remove()
-    fig = plt.figure(figsize=(5.5, 2.75), constrained_layout=True)
+
+    fig = plt.figure(figsize=(5.5, 3), constrained_layout=True)
     gs = fig.add_gridspec(2, 5) # , wspace=0.1, hspace=.25)
     axs = []
+
     axs.append(fig.add_subplot(gs[ : , 0]))
     axs.append(fig.add_subplot(gs[ : , 1]))
     axs.append(fig.add_subplot(gs[ :1, 2]))
@@ -107,6 +89,3 @@ if __name__ == "__main__":
 
         # plotter.save()
         fig.savefig(sys.argv[3], format="pdf")
-
-    # link to the result
-    # os.link(plotter.outdir / relname, sys.argv[3])

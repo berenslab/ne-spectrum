@@ -22,7 +22,7 @@ if __name__ == "__main__":
     umap_titles = []
     for nu in nus:
         umap_runs.append(umap_init / f"umap;n_iter:{n_epochs};nu:{nu};eps:1")
-        umap_titles.append(f"UMAP, $\\nu={{}}${nu},\n$\\epsilon={{}}$1")
+        umap_titles.append(f"UMAP,\n$m={{}}${nu}, $\\epsilon={{}}$1")
 
     tsne_runs = [
         dsrc / "affinity/stdscale;f:1e-4/tsne",
@@ -55,7 +55,4 @@ if __name__ == "__main__":
     jnb_msc.redo.redo_ifchange(list(filedeps) + datadeps)
     plotter.load()
     fig, axs = plotter.transform()
-    plotter.save()
-
-    # link to the result
-    os.link(plotter.outdir / relname, sys.argv[3])
+    fig.savefig(sys.argv[3], format="pdf")

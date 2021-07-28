@@ -26,14 +26,12 @@ if __name__ == "__main__":
     )
     trans_f = Path() / "../../static/df_unicode_sym.csv"
     font_path = Path() / "../../static/Hubballi-Regular.ttf"
-    corrs_f = Path() / "../../stats/kannada_corr.csv"
 
     # passing a relative plotname will ensure that the plot will also
     # be saved in the data dir.
     relname = Path(sys.argv[2])
-    plotter = jnb_msc.plot.ExtPanelPlot(
+    plotter = jnb_msc.plot.SixPanelPlot(
         datafiles,
-        corrs_f.absolute(),
         plotname=relname,
         titles=titles,
         format=relname.suffix.replace(".", ""),
@@ -50,7 +48,7 @@ if __name__ == "__main__":
 
     datadeps = plotter.get_datadeps()
 
-    redo.redo_ifchange(list(filedeps) + datadeps + [trans_f, corrs_f])
+    redo.redo_ifchange(list(filedeps) + datadeps + [trans_f])
     df = pd.read_csv(trans_f)
 
     plotter.load()
@@ -72,7 +70,4 @@ if __name__ == "__main__":
                 # "fontweight": "bold",
             },
         )
-
-    plotter.save()
-    # link to the result
-    os.link(plotter.outdir / relname, sys.argv[3])
+    fig.savefig(sys.argv[3], format="pdf")

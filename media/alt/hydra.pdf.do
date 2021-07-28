@@ -22,14 +22,12 @@ if __name__ == "__main__":
     datafiles, titles = jnb_msc.plot.SixPanelPlot.panel_datapaths(
         dsrc, lo_exag=lo_exag, hi_exag=hi_exag
     )
-    corrs_f = Path() / f"../../stats/{data}_corr.csv"
 
     # passing a relative plotname will ensure that the plot will also
     # be saved in the data dir.
     relname = Path(sys.argv[2])
-    plotter = jnb_msc.plot.ExtPanelPlot(
+    plotter = jnb_msc.plot.SixPanelPlot(
         datafiles,
-        corrs_f.absolute(),
         plotname=relname,
         titles=titles,
         format=relname.suffix.replace(".", ""),
@@ -46,11 +44,8 @@ if __name__ == "__main__":
 
     datadeps = plotter.get_datadeps()
 
-    redo.redo_ifchange(list(filedeps) + datadeps + [corrs_f])
+    redo.redo_ifchange(list(filedeps) + datadeps)
     plotter.load()
-    plotter.data[0] *= -1
+    plotter.data[0][:, 1] *= -1
     fig, axs = plotter.transform()
-    plotter.save()
-
-    # link to the result
-    os.link(plotter.outdir / relname, sys.argv[3])
+    fig.savefig(sys.argv[3], format="pdf")

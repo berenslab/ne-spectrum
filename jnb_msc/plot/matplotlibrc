@@ -15,7 +15,7 @@ figure.dpi         : 600         ## figure dots per inch
 #figure.frameon     : True      ## enable figure frame
 
 font.size : 6
-font.family : Arial, Helvetica, sans-serif
+font.family : Arial, Helvetica, sans-serif, DejaVu Sans
 font.sans-serif : Arial, Helvetica, sans-serif
 font.serif : TeX Gyre Termes
 axes.titlesize : larger

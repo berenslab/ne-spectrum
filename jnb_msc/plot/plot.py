@@ -328,6 +328,8 @@ class SixPanelPlot(ScatterMultiple):
                     # in the "legend" axes
                     if "treutlein" in [p[: len("treutlein")] for p in self.path.parts]:
                         add_treutlein_legend(ax, self.labels)
+                    if "hydra" in [p[: len("hydra")] for p in self.path.parts]:
+                        add_hydra_legend(ax, self.labels)
                     if "gauss_devel" in [
                         p[: len("gauss_devel")] for p in self.path.parts
                     ]:
@@ -400,7 +402,7 @@ class SixPanelPlot(ScatterMultiple):
         tsnes = [tsne, tsne4, tsne30]
 
         titles = [
-            "Laplacian Eigenmaps",
+            "Laplacian Eig.",
             "ForceAtlas2",
             "UMAP",
             "t-SNE",
@@ -732,6 +734,8 @@ class ExtPanelPlot(SixPanelPlot):
                     # in the "legend" axes
                     if "treutlein" in [p[: len("treutlein")] for p in self.path.parts]:
                         add_treutlein_legend(ax, self.labels)
+                    if "hydra" in [p[: len("hydra")] for p in self.path.parts]:
+                        add_hydra_legend(ax, self.labels)
                     if "gauss_devel" in [
                         p[: len("gauss_devel")] for p in self.path.parts
                     ]:
@@ -811,6 +815,33 @@ def add_treutlein_legend(ax, labels):
         "  4 months": "maroon",
     }
     # lines.Line2D([], [], color="blue", marker="*", markersize=15, label="Blue stars")
+    markers = [
+        mpl.lines.Line2D(
+            [],
+            [],
+            label=key,
+            color=c,
+            ls="",
+            marker=mpl.rcParams["scatter.marker"],
+            markersize=mpl.rcParams["font.size"],
+        )
+        for key, c in lbl_map.items()
+        if c in labels
+    ]
+    legend = ax.legend(
+        handles=markers, loc="center", fancybox=False, handletextpad=0.1,
+    )
+    legend.get_frame().set_linewidth(0.4)
+    return legend
+
+
+def add_hydra_legend(ax, labels):
+    lbl_map = {
+        "endoderm": "xkcd:light green",
+        "ectoderm": "xkcd:sky blue",
+        "interstitial": "xkcd:salmon",
+    }
+
     markers = [
         mpl.lines.Line2D(
             [],

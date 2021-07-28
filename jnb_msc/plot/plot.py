@@ -134,7 +134,7 @@ class ScatterMultiple(ProjectBase):
                 if self.scalebars:
                     self.add_scalebar(ax, self.scalebars)
 
-                if self.lettering:
+                if self.lettering and len(ax_iter) > 1:
                     self.add_lettering(ax, letter)
 
             # if any axes are left empty, remove them

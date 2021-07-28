@@ -14,26 +14,33 @@ from pathlib import Path
 
 if __name__ == "__main__":
     dsrc = Path("../../data/mnist/pca/")
+    prefix = dsrc / "affinity"
+
+    std = 50
+    setups = [
+        "stdscale;f:1e-4/tsne",
+        "stdscale;f:1e-4/tsne;early_exaggeration:1/",
+        f"stdscale;f:{std:g}/tsne",
+    ]
 
     datafiles = [
-        dsrc / "affinity/stdscale;f:1e-4/tsne",
-        dsrc / "affinity/stdscale;f:1e-4/tsne;early_exaggeration:1/",
-        dsrc / "affinity/stdscale;f:25/tsne",
-        # dsrc / "stdscale;f:1e-4/affinity/tsne;learning_rate:200;early_exaggeration:1/",
-        # dsrc / "stdscale;f:25/affinity/tsne;learning_rate:200",
+        prefix / r / tsne for r in [".", "random"] for tsne in setups
     ]
 
     titles = [
-        "With early exaggeration\nInitial std${}={}$0.0001",
-        "Without early exaggeration\nInitial std${}={}$0.0001",
-        "With early exaggeration\nInitial std${}={}$25",
+        "Early exaggeration,\nInitial std${}={}$0.0001,\nPCA init",
+        "No early exaggeration,\nInitial std${}={}$0.0001,\nPCA init",
+        f"Early exaggeration,\nInitial std${{}}={{}}${std},\nPCA init",
+        "Early exaggeration,\nInitial std${}={}$0.0001,\nrandom init",
+        "No early exaggeration,\nInitial std${}={}$0.0001,\nrandom init",
+        f"Early exaggeration,\nInitial std${{}}={{}}${std},\nrandom init",
     ]
 
     # passing a relative plotname will ensure that the plot will also
     # be saved in the data dir.
     relname = sys.argv[2]
-    plotter = jnb_msc.plot.PlotRow(
-        datafiles, plotname=relname, titles=titles, format="pdf", scalebars=0.2
+    plotter = jnb_msc.plot.ScatterMultiple(
+        datafiles, plotname=relname, titles=titles, format="pdf", scalebars=0.2, layout=(2,3),
     )
     filedeps = set(
         [
@@ -48,7 +55,4 @@ if __name__ == "__main__":
     redo.redo_ifchange(list(filedeps) + datadeps)
     plotter.load()
     fig, axs = plotter.transform()
-    plotter.save()
-
-    # link to the result
-    os.link(plotter.outdir / relname, sys.argv[3])
+    fig.savefig(sys.argv[3], format="pdf", dpi=200)

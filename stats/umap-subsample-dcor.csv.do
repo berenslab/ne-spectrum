@@ -21,42 +21,39 @@ def computeNoverZ(Z, m=1000):
 
 if __name__ == "__main__":
     dsrc = Path("../data/mnist")
-    rng = np.random.RandomState(72070)
+    rng = np.random.default_rng(314)
 
     steps_n = pd.Index(range(5000, 70001, 5000), name="n")
     steps_rho = pd.Index(np.linspace(1, 10, 19), name="rho")
-    runs = []
+    tsnes = []
     umaps = []
     ns = []
     rhos = []
     for n in steps_n:
         if n != 70000:
-            dsrc_sub = dsrc / f"subsample;n:{n}/pca"
+            dsrc_sub = dsrc / f"subsample;n:{n}" / "pca"
         elif n == 70000:
             dsrc_sub = dsrc / "pca"
-        umaps.append(dsrc_sub / "umap_knn/maxscale;f:10/umap/data.npy")
+        umaps.append(dsrc_sub / "umap_knn/maxscale;f:10/umap;random_state:42/data.npy")
         for rho in steps_rho:
             tsne_ = "tsne" + ("" if rho == 1 else f";late_exaggeration:{rho:g}")
             ns.append(n)
             rhos.append(rho)
-            runs.append(dsrc_sub / "affinity/stdscale;f:1e-4" / tsne_ / "data.npy")
+            tsnes.append(dsrc_sub / "affinity/stdscale;f:1e-4" / tsne_ / "data.npy")
 
-    tsnes = runs + [
-        # dsrc / "pca/affinity/stdscale;f:1e-4/tsne/data.npy",
-        # dsrc / "pca/affinity/stdscale;f:1e-4/tsne;late_exaggeration:4/data.npy",
-    ]
     # ns += [70000, 70000]  # add full dataset
     # rhos += [1, 4]
     lib.redo.redo_ifchange(umaps + tsnes + [lib.__file__])
 
     values = np.empty((len(steps_n), len(steps_rho)))
-    n_subsel = 6000
+    n_subsel = 5000
+    subsel = rng.choice(n_subsel, n_subsel, replace=False)
     for i, n in enumerate(steps_n):
         if n != 70000:
-            dsrc_sub = dsrc / f"subsample;n:{n}/pca"
+            dsrc_sub = dsrc / f"subsample;n:{n}" / "pca"
         elif n == 70000:
             dsrc_sub = dsrc / "pca"
-        umap = np.load(dsrc_sub / "umap_knn/maxscale;f:10/umap/data.npy")
+        umap = np.load(dsrc_sub / "umap_knn/maxscale;f:10/umap;random_state:42/data.npy")
         subsel = rng.choice(umap.shape[0], min(n_subsel, umap.shape[0]), replace=False)
 
         for j, rho in enumerate(steps_rho):

@@ -41,5 +41,4 @@ mathtext.rm : sans
 mathtext.sf : sans
 mathtext.bf  : sans:bold
 mathtext.cal : sans
-mathtext.default : regular
 # mathtext.fontset : custom

@@ -15,59 +15,57 @@ import pandas as pd
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
-from scipy.spatial.distance import pdist
 from pathlib import Path
-from itertools import cycle
-from matplotlib.legend_handler import HandlerTuple
 
 
 def plot_mnn(axs, df):
-    ax, leg_ax = axs
+
+    lbl_txts = [
+        ("mnist", "MNIST"),
+        ("famnist", "Fashion MNIST"),
+        ("kuzmnist", "Kuzushiji MNIST"),
+        ("kannada", "Kannada MNIST"),
+        ("treutlein", "Chimp organoid"),
+        ("treutlein_409b2", "Human organoid"),
+        ("tasic", "Mouse cortex"),
+        ("hydra", "Hydra"),
+        ("zfish", "Zebrafish"),
+    ]
 
     umap = df.loc["umap"]
     fa2 = df.loc["fa2"]
     df = df.loc["tsne"]
 
-    line, = ax.plot(df.index, df["mnist"],           label="MNIST", zorder=3)
-    c = line.get_color()
-    ax.plot(df.index, df["famnist"],         label="Fashion MNIST")
-    ax.plot(df.index, df["kuzmnist"],        label="Kuzushiji MNIST")
-    ax.plot(df.index, df["kannada"],         label="Kannada MNIST")
-    ax.plot(df.index, df["treutlein"],       label="Chimp organoid")
-    ax.plot(df.index, df["treutlein_409b2"], label="Human organoid")
-    ax.plot(df.index, df["tasic"],           label="Mouse cortex")
-    ax.plot(df.index, df["hydra"],           label="Hydra")
-    ax.plot(df.index, df["zfish"],           label="Zebrafish")
+    cmap = plt.get_cmap('tab10')
+    for i, (ax, (lbl, title)) in enumerate(zip(axs.flat, lbl_txts)):
+        ax.set_title(title, fontsize="medium")
+        line, = ax.plot(df.index, df[lbl], color="black") # mpl.colors.rgb2hex(cmap(i))
+        c = line.get_color()
 
-    x, y = umap.index[0], umap["mnist"]
-    ax.scatter(x, y, c=c, s=15, zorder=3)
-    ax.text(x - 0.5, y, "UMAP", horizontalalignment="right", verticalalignment="top")
+        x, y = umap.index[0], umap[lbl]
+        ax.scatter(x, y, c=c, s=15, zorder=3)
+        ax.text(x + 0.5, y, "UMAP", horizontalalignment="left", verticalalignment="bottom")
 
-    x, y = fa2.index[0], fa2["mnist"]
-    ax.scatter(x, y, c=c, s=15, zorder=3)
-    ax.text(x, y - y * 0.1, "FA2", horizontalalignment="right", verticalalignment="top")
+        x, y = fa2.index[0], fa2[lbl]
+        ax.scatter(x, y, c=c, s=15, zorder=3)
+        ax.text(x, y * 1.15, "FA2", horizontalalignment="left", verticalalignment="bottom")
 
-    jnb_msc.plot.despine(ax)
-    ax.set_xlim(df.index[0], df.index[-1])
-    ax.set_xscale("log")
-    ax.set_xlabel(r"Exaggeration ($\rho$)")
+        jnb_msc.plot.despine(ax)
 
-    ax.set_ylabel("$k$NN recall ($k=15$)")
-    ax.set_ylim(bottom=0)
+    for ax in axs[-1, :]:
+        ax.set_xlim(df.index[0], df.index[-1])
+        ax.set_xscale("log")
+        ax.set_xlabel(r"Exaggeration ($\rho$)")
 
-    handles, labels = ax.get_legend_handles_labels()
-    leg_ax.set_axis_off()
-    leg_ax.legend(
-        handles, labels, loc="center", ncol=1, mode=None, frameon=False
-    )
-
-    return ax
+    for ax in axs[:, 0]:
+        ax.set_ylabel("$k$NN recall ($k=15$)")
+        ax.set_ylim(bottom=0)
 
 
 if __name__ == "__main__":
 
     mnn_fpath = "../stats/neigh-presv/mutual-neigh-frac.csv"
-    redo.redo_ifchange(mnn_fpath)
+    # redo.redo_ifchange(mnn_fpath)
 
     # abuse the plotter object to get the rc
     plotter = jnb_msc.plot.ScatterMultiple("../data/mnist/")
@@ -79,13 +77,12 @@ if __name__ == "__main__":
 
     with plt.rc_context(fname=rcfile):
         fig, axs = plt.subplots(
-            1,
-            2,
-            figsize=(5.5 * 0.75, 1.75),
+            3,
+            3,
+            sharex=True,
+            sharey=True,
+            figsize=(5.5 * 0.6, 5.5 * 0.6),
             constrained_layout=True,
-            # gridspec_kw={
-            #     "width_ratios": [1, 0.001],
-            # }
         )
 
         plot_mnn(axs, df)

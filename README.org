@@ -1,8 +1,8 @@
 This repository holds the code for https://www.jmlr.org/papers/v23/21-0055.html: Attraction-Repulsion Spectrum in Neighbor Embeddings.
 
 If you use the work herein, we'd appreciate the following citation:
-#+bein_src
-@article{JMLR:v23:21-0055,
+#+begin_src
+@article{boehm2022attraction,
   author  = {Jan Niklas Böhm and Philipp Berens and Dmitry Kobak},
   title   = {Attraction-Repulsion Spectrum in Neighbor Embeddings},
   journal = {Journal of Machine Learning Research},
